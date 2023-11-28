@@ -17,7 +17,7 @@ Advent of Code is an annual series of Christmas-themed programming puzzles cover
 - **Share, Don't Plagiarize**: While it's okay to take inspiration from others, direct copying of someone else's work without credit is not cool. Let's keep the spirit of fairness and originality alive!
 
 ## Stay Connected
-- Join our [#advent_of_code_2023](https://precisdigital.slack.com/archives/C067BF6U3QD) on slack to discuss solutions, share experiences, and enjoy some good old holiday camaraderie.
+- Join [#advent_of_code_2023](https://precisdigital.slack.com/archives/C067BF6U3QD) on slack to discuss solutions, share experiences, and enjoy some good old holiday camaraderie.
 
 So, are you ready to embark on this festive coding journey? Let's make this Advent season a memorable one filled with fun challenges and learning opportunities! 🎅🤶🎁🎄💻
 
