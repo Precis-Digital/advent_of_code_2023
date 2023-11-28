@@ -1,6 +1,4 @@
-# README for Advent of Code 2023 Repository
-
-🎄 **Welcome to Precis' Advent of Code 2023 Repository!** 🎄
+# 🎄 Welcome to Precis' Advent of Code 2023 Repository! 🎄
 
 ## What is Advent of Code?
 Advent of Code is an annual series of Christmas-themed programming puzzles covering a wide array of challenges that can be solved using any programming language you prefer. For more information, check out [Advent of Code 2023](https://adventofcode.com/2023).
