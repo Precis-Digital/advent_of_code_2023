@@ -180,3 +180,5 @@ terraform.rc
 secrets/
 tmp.py
 tmp.txt
+
+*/**/.yarn
