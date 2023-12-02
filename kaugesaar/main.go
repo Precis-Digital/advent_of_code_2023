@@ -18,9 +18,9 @@ var solvers = []Solver{
 	day01.Solver{},
 }
 
-func run(run func() common.Solution) {
+func run(solve func() common.Solution) {
 	start := time.Now()
-	s := run()
+	s := solve()
 	elapsed := time.Since(start)
 	ms := float64(elapsed.Nanoseconds()) / 1e6
 
@@ -42,7 +42,9 @@ func runAllSolvers() {
 func runSolver(day string, part string) {
 	d := utils.ToInt(day)
 	solver := solvers[d-1]
+
 	printDay(d)
+
 	switch part {
 	case "1":
 		run(solver.Part1)
