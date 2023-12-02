@@ -2,7 +2,7 @@ package day01
 
 import (
 	_ "embed" // For embedding the input file
-	"kaugesaar-aoc/common"
+	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"math"
 	"strings"
@@ -93,8 +93,8 @@ func p1() string {
 }
 
 // Part1 the solution for part 1, day 1
-func (s Solver) Part1() common.Solution {
-	return common.Solution{
+func (s Solver) Part1() solution.Response {
+	return solution.Response{
 		Day:    1,
 		Part:   1,
 		Answer: p1(),
@@ -102,8 +102,8 @@ func (s Solver) Part1() common.Solution {
 }
 
 // Part2 the solution for part 2, day 1
-func (s Solver) Part2() common.Solution {
-	return common.Solution{
+func (s Solver) Part2() solution.Response {
+	return solution.Response{
 		Day:    1,
 		Part:   2,
 		Answer: p2(),
