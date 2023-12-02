@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
+	"strings"
 	"strconv"
+	"erica/utils"
 )
 
 var numberDict = map[string]int{
@@ -97,17 +97,10 @@ func isDigit(r rune) bool {
 }
 
 func main() {
-	file, err := os.Open("inputs/day01.txt")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
+	inputFilePath := "inputs/day01.txt"
+	content, _ := utils.ReadFile(inputFilePath)
 
-	var puzzleInput []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		puzzleInput = append(puzzleInput, scanner.Text())
-	}
+    puzzleInput := strings.Split(strings.TrimSpace(content), "\n")
 
 	solution1 := calculateTotal(puzzleInput, findInteger)
 	solution2 := calculateTotal(puzzleInput, findIntegerOrSpelledOutNumber)

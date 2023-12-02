@@ -35,8 +35,15 @@ case "${filename##*.}" in
     time python "$filename"
     ;;
   go)
-    echo "Running Go file: $filename"
-    time go run "$filename"
+    echo "Building Go file: $filename"
+    go build "$filename"
+    if [ $? -eq 0 ]; then
+      echo "Running Go file: $filename"
+      time "./${filename%.go}"
+    else
+      echo "Build failed for $filename"
+      exit 1
+    fi
     ;;
   *)
     echo "Unsupported file type"
