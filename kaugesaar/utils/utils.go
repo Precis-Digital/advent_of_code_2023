@@ -11,6 +11,13 @@ func ToStr(i int) string {
 	return strconv.Itoa(i)
 }
 
+func MaxInt(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func SumArr(arr []int) int {
 	sum := 0
 	for _, value := range arr {

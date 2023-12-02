@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"kaugesaar-aoc/2023/day01"
+	"kaugesaar-aoc/2023/day02"
 	"kaugesaar-aoc/common"
 	"kaugesaar-aoc/utils"
 	"os"
@@ -16,6 +17,7 @@ type Solver interface {
 
 var solvers = []Solver{
 	day01.Solver{},
+	day02.Solver{},
 }
 
 func run(solve func() common.Solution) {

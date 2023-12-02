@@ -1,7 +1,7 @@
 package day01
 
 import (
-	_ "embed"
+	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/common"
 	"kaugesaar-aoc/utils"
 	"math"
