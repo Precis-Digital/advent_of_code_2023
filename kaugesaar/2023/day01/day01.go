@@ -4,7 +4,6 @@ import (
 	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
-	"math"
 	"strings"
 	"unicode"
 )
@@ -15,50 +14,35 @@ var fileInput string
 // Solver for day 1 and its both parts
 type Solver struct{}
 
-func p2() string {
+func parser(part int) string {
 	rows := strings.Split(fileInput, "\n")
 	var numbers []int
 
-	digitMap := map[string]int{
-		"one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
-		"six": 6, "seven": 7, "eight": 8, "nine": 9,
-	}
-
-	findNumber := func(word string, index int) (string, bool) {
-		start := int(math.Max(0, float64(index-1)))
-		for i := 1; i <= 5 && start+i <= len(word); i++ {
-			slicedWord := word[start : start+i]
-			if num, exsists := digitMap[slicedWord]; exsists {
-				return utils.ToStr(num), true
+	findFirst := func(s string) string {
+		for i := 0; i < len(s); i++ {
+			if unicode.IsDigit(rune(s[i])) {
+				return string(s[i])
 			}
 		}
-		return "", false
+		return ""
+	}
+
+	findLast := func(s string) string {
+		for i := len(s) - 1; i >= 0; i-- {
+			if unicode.IsDigit(rune(s[i])) {
+				return string(s[i])
+			}
+		}
+		return ""
 	}
 
 	for _, row := range rows {
-		var first, last string
-		foundFirst := false
-		currentWord := ""
-
-		for i, r := range row {
-			if unicode.IsDigit(r) {
-				if !foundFirst {
-					first = string(r)
-					foundFirst = true
-				}
-				last = string(r)
-			} else if unicode.IsLetter(r) {
-				currentWord += string(r)
-				if num, exsits := findNumber(row, i); exsits {
-					if !foundFirst {
-						first = num
-						foundFirst = true
-					}
-					last = num
-					currentWord = ""
-				}
-			}
+		if part == 2 {
+			row = replacer(row)
 		}
+
+		first := findFirst(row)
+		last := findLast(row)
 
 		number := utils.ToInt(first + last)
 		numbers = append(numbers, number)
@@ -67,29 +51,24 @@ func p2() string {
 	return utils.ToStr(utils.SumArr(numbers))
 }
 
-func p1() string {
-	rows := strings.Split(fileInput, "\n")
-	var numbers []int
-
-	for _, row := range rows {
-		var first, last string
-		foundFirst := false
-
-		for _, r := range row {
-			if unicode.IsDigit(r) {
-				if !foundFirst {
-					first = string(r)
-					foundFirst = true
-				}
-				last = string(r)
-			}
-		}
-
-		number := utils.ToInt(first + last)
-		numbers = append(numbers, number)
+func replacer(s string) string {
+	replaceMap := map[string]string{
+		"one":   "o1e",
+		"two":   "t2o",
+		"three": "t3e",
+		"four":  "4",
+		"five":  "5e",
+		"six":   "6",
+		"seven": "7n",
+		"eight": "e8t",
+		"nine":  "n9e",
 	}
 
-	return utils.ToStr(utils.SumArr(numbers))
+	for key, value := range replaceMap {
+		s = strings.ReplaceAll(s, key, value)
+	}
+
+	return s
 }
 
 // Part1 the solution for part 1, day 1
@@ -97,7 +76,7 @@ func (s Solver) Part1() solution.Response {
 	return solution.Response{
 		Day:    1,
 		Part:   1,
-		Answer: p1(),
+		Answer: parser(1),
 	}
 }
 
@@ -106,6 +85,6 @@ func (s Solver) Part2() solution.Response {
 	return solution.Response{
 		Day:    1,
 		Part:   2,
-		Answer: p2(),
+		Answer: parser(2),
 	}
 }

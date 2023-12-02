@@ -11,7 +11,7 @@ import (
 //go:embed day2.txt
 var fileInput string
 
-// Solver for day 1 and its both parts
+// Solver for day 2 and its both parts
 type Solver struct{}
 
 // Game contains the game data
@@ -22,6 +22,12 @@ type Game struct {
 	Green   int
 	Red     int
 }
+
+var (
+	blueRegex  = regexp.MustCompile(`(\d+) blue`)
+	redRegex   = regexp.MustCompile(`(\d+) red`)
+	greenRegex = regexp.MustCompile(`(\d+) green`)
+)
 
 func parser() []Game {
 	rows := strings.Split(fileInput, "\n")
@@ -34,9 +40,9 @@ func parser() []Game {
 		game.IsValid = true
 
 		for _, subGame := range strings.Split(row, ";") {
-			blues := regexp.MustCompile(`(\d+) blue`).FindAllStringSubmatch(subGame, -1)
-			reds := regexp.MustCompile(`(\d+) red`).FindAllStringSubmatch(subGame, -1)
-			greens := regexp.MustCompile(`(\d+) green`).FindAllStringSubmatch(subGame, -1)
+			reds := redRegex.FindAllStringSubmatch(subGame, -1)
+			greens := greenRegex.FindAllStringSubmatch(subGame, -1)
+			blues := blueRegex.FindAllStringSubmatch(subGame, -1)
 
 			for _, red := range reds {
 				game.Red = utils.MaxInt(game.Red, utils.ToInt(red[1]))
