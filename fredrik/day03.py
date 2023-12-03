@@ -122,9 +122,6 @@ def main() -> None:
     part_sum = schematic_parser.calculate_part_sum()
     gear_ratio_sum = schematic_parser.calculate_gear_ratio_sum()
 
-    assert part_sum == 531932
-    assert gear_ratio_sum == 73646890
-
     print(f"Part 1: {part_sum}")
     print(f"Part 2: {gear_ratio_sum}")
 
