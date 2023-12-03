@@ -6,6 +6,14 @@ import (
 	"os"
 )
 
+func preProcess(s *bufio.Scanner) int{
+	s.Split(bufio.ScanLines)
+	for s.Scan() {
+		fmt.Println(s.Text())
+	}
+	return 0
+}
+
 func main() {
 	fileName := os.Args[1]
 	version := os.Args[2]
@@ -20,9 +28,9 @@ func main() {
 	defer file.Close() // defer closing the file
 
 	scanner := bufio.NewScanner(file)
-	games := GamesFromScanner(scanner)
+	test := preProcess(scanner)
 
 	// fmt.Println(games)
-	fmt.Println("Answer Problem 1:", problem1(games))
-	fmt.Println("Answer Problem 2:", problem2(games))
+	// fmt.Println("Answer Problem 1:", problem1(___))
+	// fmt.Println("Answer Problem 2:", problem2(___))
 }
