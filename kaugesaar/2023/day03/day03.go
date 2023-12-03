@@ -2,6 +2,7 @@ package day03
 
 import (
 	_ "embed" // For embedding the input file
+	"fmt"
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"regexp"
@@ -30,15 +31,11 @@ var (
 	symbolRegex     = regexp.MustCompile(`[^\.0-9]`)
 	digitRegex      = regexp.MustCompile(`(\d+|[^\d])`)
 	numberCells     = make(map[string]*Cell)
-	parsedschematic = parser()
+	parsedSchematic = parseSchematic()
 )
 
-func isGear(s string) bool {
-	return s == "*"
-}
-
-func makeCellFromString(s string, row, start, end int) *Cell {
-	cord := utils.ToStr(row) + utils.ToStr(start) + utils.ToStr(end)
+func createOrGetCell(s string, row, start, end int) *Cell {
+	cord := fmt.Sprintf("%d%d%d", row, start, end)
 	if unicode.IsDigit(rune(s[0])) {
 
 		if cell, exists := numberCells[cord]; exists {
@@ -46,30 +43,29 @@ func makeCellFromString(s string, row, start, end int) *Cell {
 		}
 
 		cell := &Cell{
-			value:     s,
-			isSymbol:  false,
-			isNumber:  true,
-			isVisited: false,
-			isGear:    false,
+			value:    s,
+			isNumber: true,
 		}
 		numberCells[cord] = cell
 		return cell
 	}
 
 	return &Cell{
-		value:     s,
-		isSymbol:  isSymbol(s),
-		isGear:    isGear(s),
-		isNumber:  false,
-		isVisited: false,
+		value:    s,
+		isSymbol: isSymbol(s),
+		isGear:   isGear(s),
 	}
+}
+
+func isGear(s string) bool {
+	return s == "*"
 }
 
 func isSymbol(s string) bool {
 	return symbolRegex.MatchString(s)
 }
 
-func parser() [][]*Cell {
+func parseSchematic() [][]*Cell {
 	var schematic [][]*Cell
 	rows := strings.Split(fileInput, "\n")
 
@@ -79,20 +75,26 @@ func parser() [][]*Cell {
 		for _, match := range matches {
 			start, end := match[0], match[1]
 			for i := start; i < end; i++ {
-				cells = append(cells, makeCellFromString(string(row[start:end]), x, start, end))
+				cells = append(cells, createOrGetCell(string(row[start:end]), x, start, end))
 			}
 		}
 		schematic = append(schematic, cells)
 	}
 
-	parseschematic(schematic)
+	for x, row := range schematic {
+		for y, cell := range row {
+			if cell.isSymbol {
+				parseAdjacentNumbers(cell, schematic, x, y)
+			}
+		}
+	}
 
 	return schematic
 }
 
 func p1() string {
 	sum := 0
-	for _, row := range parsedschematic {
+	for _, row := range parsedSchematic {
 		for _, cell := range row {
 			if cell.isSymbol {
 				sum += utils.SumArr(cell.adjacentNumbers)
@@ -105,7 +107,7 @@ func p1() string {
 
 func p2() string {
 	sum := 0
-	for _, row := range parsedschematic {
+	for _, row := range parsedSchematic {
 		for _, cell := range row {
 			if cell.isGear && cell.nAdjacentNumbers == 2 {
 				sum += cell.adjacentNumbers[0] * cell.adjacentNumbers[1]
@@ -128,16 +130,6 @@ func parseAdjacentNumbers(source *Cell, schematic [][]*Cell, x, y int) {
 					source.adjacentNumbers = append(source.adjacentNumbers, num)
 					source.nAdjacentNumbers++
 				}
-			}
-		}
-	}
-}
-
-func parseschematic(schematic [][]*Cell) {
-	for x, row := range schematic {
-		for y, cell := range row {
-			if cell.isSymbol {
-				parseAdjacentNumbers(cell, schematic, x, y)
 			}
 		}
 	}
