@@ -4,7 +4,7 @@ import re
 def solve_01_1():
     print('*' * 20, 'Step 1')
     re_digits = re.compile(r'(\d)')
-    with open('input_01.txt', 'r') as input_file:
+    with open('input.txt', 'r') as input_file:
         result = 0
         for line in input_file:
             digits = re_digits.findall(line)
@@ -35,7 +35,7 @@ def solve_01_2():
         dict_eng_digits[str(index)] = index
     re_first_digit = re.compile(r'(\d|' + '|'.join(eng_digits) + r')')
     re_last_digit = re.compile(r'.*(\d|' + '|'.join(eng_digits) + r')')
-    with (open('input_01.txt', 'r') as input_file):
+    with (open('input.txt', 'r') as input_file):
         result = 0
         for line in input_file:
             try:
