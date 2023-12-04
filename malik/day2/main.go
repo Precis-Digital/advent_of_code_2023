@@ -92,8 +92,6 @@ func problem1(games Games) int {
 	return sumOfGameIdsForValidGames
 }
 
-
-
 func problem2(games Games) int {
 
 	sumOfGameIdsForValidGames := 0
