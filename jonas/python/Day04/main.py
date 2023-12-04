@@ -71,19 +71,13 @@ def task_two(sample=False):
 
     cache = {}
 
-    def traverse_card_tree(card):
+    for index, card in reversed(list(enumerate(lines))):
         card_num = int(card.split(": ")[0].replace("Card ", ""))
         winning_numbers = get_winning_numbers_count(card)
         winning_card_numbers_map[card_num] += 1
 
         for i in range(winning_numbers):
-            if card_num + i in cache:
-                winning_card_numbers_map[card_num] += cache[card_num + i]
-            else:
-                traverse_card_tree(lines[card_num + i])
-
-    for index, card in reversed(list(enumerate(lines))):
-        traverse_card_tree(card)
+            winning_card_numbers_map[card_num] += cache[card_num + i]
         cache[index] = winning_card_numbers_map[index + 1]
 
     answer = sum(winning_card_numbers_map.values())
