@@ -4,13 +4,11 @@ from utils.input_reader import read_input
 
 puzzle_input = read_input("inputs/day04.txt").split("\n")
 
-pattern = r"Card\s*\d+"
-
 
 def parse_cards(list_of_scratch_cards: list[str]) -> list[tuple]:
     cards = []
     for card in list_of_scratch_cards:
-        card_number = re.search(pattern, card).group()
+        card_number = re.search(r"Card\s*\d+", card).group()
         card = card.replace(f"{card_number}: ", "")
         split_card_number = card.split(" | ")
         winning_numbers = [
