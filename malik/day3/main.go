@@ -13,28 +13,26 @@ import (
 	"strconv"
 )
 
-
 type NumberLocationMap map[[2]int]int
 type SymbolLocationMap map[[2]int]string
-
 
 func problem1(numberLocation NumberLocationMap, symbolLocation SymbolLocationMap) int {
 
 	partNumberSum := 0
 
 	for location, number := range numberLocation {
-		numberLength :=  len(strconv.Itoa(number))
-		
+		numberLength := len(strconv.Itoa(number))
+
 		isAdjacentToSymbol := false
 		// traverse the length of the number
 		for i := 0; i < numberLength; i++ {
 			x := location[0]
 			y := location[1] + i
-			
+
 			// check in all directions for a symbol
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
-					if _, ok := symbolLocation[[2]int{x + i, y + j}];  ok {
+					if _, ok := symbolLocation[[2]int{x + i, y + j}]; ok {
 						isAdjacentToSymbol = true
 					}
 				}
@@ -42,12 +40,11 @@ func problem1(numberLocation NumberLocationMap, symbolLocation SymbolLocationMap
 		}
 		if isAdjacentToSymbol {
 			partNumberSum += number
-		}		
+		}
 
 	}
 	return partNumberSum
 }
-
 
 func problem2(numberLocation NumberLocationMap, symbolLocation SymbolLocationMap) int {
 	// pretty much the same solutoin, but just need to keep track of if the symbol is a *...
@@ -58,13 +55,13 @@ func problem2(numberLocation NumberLocationMap, symbolLocation SymbolLocationMap
 	gearRatioSum := 0
 
 	for numberPostion, number := range numberLocation {
-		numberLength :=  len(strconv.Itoa(number))
-		
+		numberLength := len(strconv.Itoa(number))
+
 		// traverse the length of the number
 		for i := 0; i < numberLength; i++ {
 			x := numberPostion[0]
 			y := numberPostion[1] + i
-			
+
 			// check in all directions for a symbol
 			for i := -1; i <= 1; i++ {
 				for j := -1; j <= 1; j++ {
@@ -74,7 +71,7 @@ func problem2(numberLocation NumberLocationMap, symbolLocation SymbolLocationMap
 						if _, ok := gears[symbolPosition]; !ok {
 							gears[symbolPosition] = make(map[[2]int]int)
 						}
-						gears[symbolPosition][numberPostion]  = number
+						gears[symbolPosition][numberPostion] = number
 					}
 				}
 			}
@@ -94,15 +91,11 @@ func problem2(numberLocation NumberLocationMap, symbolLocation SymbolLocationMap
 	return gearRatioSum
 }
 
+func extractNumbersAndSymbols(s *bufio.Scanner) (NumberLocationMap, SymbolLocationMap) {
 
-
-
-
-func extractNumbersAndSymbols(s *bufio.Scanner) (NumberLocationMap, SymbolLocationMap)  {
-
-	numberRegex,_ := regexp.Compile("([0-9]+)")
+	numberRegex, _ := regexp.Compile("([0-9]+)")
 	// find any symbol not a number or the "."
-	symbolRegex,_ := regexp.Compile("[^0-9.]")
+	symbolRegex, _ := regexp.Compile("[^0-9.]")
 
 	// location, key is array of 2 ints and the value is an integer
 	numberLocation := make(NumberLocationMap)
@@ -139,8 +132,7 @@ func main() {
 	defer file.Close() // defer closing the file
 
 	scanner := bufio.NewScanner(file)
-	numberLocation, symbolLocation :=  extractNumbersAndSymbols(scanner)
+	numberLocation, symbolLocation := extractNumbersAndSymbols(scanner)
 	fmt.Println("Answer Problem 1:", problem1(numberLocation, symbolLocation))
 	fmt.Println("Answer Problem 2:", problem2(numberLocation, symbolLocation))
 }
-	
