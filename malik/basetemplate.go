@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func preProcess(s *bufio.Scanner) int{
+func preProcess(s *bufio.Scanner) int {
 	s.Split(bufio.ScanLines)
 	for s.Scan() {
 		fmt.Println(s.Text())
