@@ -1,0 +1,42 @@
+.top-nav .image img{
+    height: 50px;
+    width: auto;
+}
+
+.page-title, .top-nav, .details{
+    display: none;
+}
+
+#main>.sidebar {
+    width: unset;
+}
+
+body.small-header #main {
+    padding-top: 0;
+}
+
+/* .category h3 {
+    display: none;
+} */
+
+.sidebar ul {
+    padding: 0;
+}
+
+.method-parameter {
+    font-size: 14px;
+}
+
+.sidebar .category h2 {
+    color: #000;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.sidebar ul li {
+    font-size: 12px;
+}
+
+#main>.side-nav {
+    width: unset;
+}

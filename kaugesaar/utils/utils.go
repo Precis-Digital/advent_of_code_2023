@@ -18,6 +18,13 @@ func MaxInt(a, b int) int {
 	return b
 }
 
+func MinInt(a, b int) int {
+	if a > b {
+		return b
+	}
+	return a
+}
+
 func SumArr(arr []int) int {
 	sum := 0
 	for _, value := range arr {

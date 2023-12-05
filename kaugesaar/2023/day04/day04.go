@@ -65,49 +65,49 @@ func p1() string {
 
 func p2() string {
 	cards := parser()
-	wins := make(map[int]int)
-	nCopies := make(map[int]int)
+	nWins := make(map[int]int)
+	instances := make(map[int]int)
 
 	for i, card := range cards {
-		matches := 0
+		wins := 0
 		for _, n := range card.Numbers {
 			if slices.Contains(card.WinningNumbers, n) {
-				matches++
+				wins++
 			}
 		}
-		wins[i+1] = matches
-		nCopies[i+1] = 1
+		nWins[i] = wins
+		instances[i] = 1
 	}
 
 	var copies []int
-	for i := range wins {
+	for i := range nWins {
 		copies = append(copies, i)
 	}
 
 	for len(copies) != 0 {
 		card := copies[0]
-		win := wins[card]
-		for _, c := range makeRange(card+1, card+win) {
-			nCopies[c]++
+		wins := nWins[card]
+		for _, c := range getCardsFrom(card+1, card+wins) {
+			instances[c]++
 			copies = append(copies, c)
 		}
 		copies = copies[1:]
 	}
 
 	sum := 0
-	for _, n := range nCopies {
+	for _, n := range instances {
 		sum += n
 	}
 
 	return utils.ToStr(sum)
 }
 
-func makeRange(min, max int) []int {
-	r := make([]int, max-min+1)
-	for i := range r {
-		r[i] = min + i
+func getCardsFrom(min, max int) []int {
+	cards := make([]int, max-min+1)
+	for i := range cards {
+		cards[i] = min + i
 	}
-	return r
+	return cards
 }
 
 // Part1 the solution for part 1, day 4

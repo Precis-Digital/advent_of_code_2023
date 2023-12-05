@@ -1,0 +1,183 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> utils/getters.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="dont-remove/style.css">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="D1_Core.html">D1_Core</a></li><li><a href="D1_Helpers.html">D1_Helpers</a></li><li><a href="D2_Core.html">D2_Core</a></li><li><a href="D2_Helpers.html">D2_Helpers</a></li><li><a href="Utils.html">Utils</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>utils/getters.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// Import the 'fs' module for file system operations
+import * as fs from 'fs';
+
+/**
+ * @namespace Utils
+ */
+
+/**
+ * Loads a text file and returns its contents as an array of lines.
+ *
+ * @memberof Utils
+ *
+ * @example
+ * const lines = loadTextFile('./path/to/file.txt');
+ * console.log(lines);
+ *
+ * @param {string} filePath - The path to the file.
+ * @returns {string[]} An array of lines from the file.
+ */
+const loadTextFile = (filePath) => {
+  // Read the file synchronously and return its contents
+  const data = fs.readFileSync(filePath, 'utf8');
+  // Split the data into lines
+  const lines = data.split('\n');
+  return lines;
+};
+
+/**
+ * Gets the size of a file in kilobytes.
+ *
+ * @memberof Utils
+ *
+ * @example
+ * const size = getFileSize('./path/to/file.txt');
+ * console.log(`File size: ${size} KB`);
+ *
+ * @param {string} filePath - The path to the file.
+ * @returns {number} The size of the file in kilobytes.
+ */
+const getFileSize = (filePath) => {
+  // Get the stats of the file and return its size
+  const stats = fs.statSync(filePath);
+  const kilobytes = Math.round(stats.size / 1024);
+  return kilobytes;
+};
+
+/**
+ * Measures the execution time of a function.
+ *
+ * @memberof Utils
+ *
+ * @example
+ * const [result, time] = getRuntime(someFunction, arg1, arg2);
+ * console.log(`Execution time: ${time} ms`);
+ *
+ * @param {Function} func - The function to measure.
+ * @param {...*} args - The arguments to pass to the function.
+ * @returns {Array} An array where the first element is the result of the function (of any type) and the second element is the execution time in milliseconds (a number).
+ */
+const getRuntime = (func, ...args) => {
+  // Get the start time
+  const startTime = process.hrtime();
+  // Call the function and get the result
+  const result = func(...args);
+  // Get the end time
+  const endTime = process.hrtime(startTime);
+  // Calculate the execution time in milliseconds
+  const executionTime = endTime[0] * 1000 + endTime[1] / 1e6;
+  // Round execution time to one decimal place
+  const executionTimeRounded = Math.round(executionTime * 10) / 10;
+  // Return the result and the execution time
+  return [result, executionTimeRounded];
+};
+
+// Export the functions for use in other modules
+export { getRuntime, getFileSize, loadTextFile };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+
+</body>
+</html>
