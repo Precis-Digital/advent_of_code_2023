@@ -22,128 +22,7 @@ const DAY = 'day4';
 
 /* CORE FUNCTIONS
 ============================================================================= */
-// function generatLineNumbers(index, length) {
-//   const numbers = [];
-//   for (let i = index + 1; i <= index + length; i++) {
-//     numbers.push(i);
-//   }
-//   return numbers;
-// }
 
-// const parseCard = (cardLine, isLoggingEnabled) => {
-//   const parts = cardLine.split(': ');
-//   const index = parts[0].split(' ').filter(str => str.length).map(Number)[1];
-//   const numbers = parts[1].split(' | ');
-//   const winnerNumber = numbers[0].split(' ').filter(str => str.length).map(Number);
-//   const myNumber = numbers[1].split(' ').filter(str => str.length).map(Number);
-//   const matchingNumbers = myNumber.filter(num => winnerNumber.includes(num));
-//   const points = matchingNumbers.length > 0 ? 2 ** (matchingNumbers.length - 1) : 0;
-
-//   // get all copies now it only goes down one level but needs to be recursive
-//   const cardsClones = generatLineNumbers(index, matchingNumbers.length);
-
-//   if (isLoggingEnabled) {
-//     cardLine = cardLine.replace('Card', matchingNumbers.length > 0 ? chalk.green('Card') : chalk.red('Card'));
-//     cardLine = chalk.grey(cardLine);
-
-//     numbers.forEach(() => {
-//       matchingNumbers.forEach((num) => {
-//         const regex = new RegExp(` ${num} `, 'g');
-//         cardLine = chalk.grey(cardLine.replace(regex, ` ${chalk.green(num)} `));
-//       });
-//     });
-
-//     console.log(
-//       cardLine,
-//       `${chalk.blue('points:')} ${chalk.yellow(points)}`,
-//     );
-//   }
-
-//   return {
-//     index,
-//     // matchingNumbers,
-//     points,
-//     cardsClones,
-//   };
-// };
-
-// const recursiveCloneCards = (cards, dataLines, CARD_INDEXES, isLoggingEnabled) => {
-//   const clonesGroups = cards.map((card) => {
-//     // console.log(card.cardsClones);
-//     const cardsClones = [];
-
-//     card.cardsClones.forEach((cardClonesNumber) => {
-//       const cardCloneLine = dataLines[cardClonesNumber - 1];
-//       const cardCloneParsed = parseCard(cardCloneLine, false);
-//       if (cardCloneParsed.cardsClones.length > 0) {
-//         cardsClones.push(cardCloneParsed);
-//       }
-//     });
-
-//     if (card.cardsClones.length > 0 /* && cardsClones.length > 0 */) {
-//       CARD_INDEXES.push(card.cardsClones);
-//       return cardsClones;
-//     }
-
-//     return null;
-//   });
-
-//   clonesGroups.forEach((clonesGroup) => {
-//     if (clonesGroup) {
-//       recursiveCloneCards(clonesGroup, dataLines, CARD_INDEXES, isLoggingEnabled);
-//     }
-//   });
-// };
-
-// const getWinningCards = (dataLines, isLoggingEnabled) => {
-
-//   const CARD_INDEXES = [];
-//   // Check if the input is a non-empty array
-//   if (!Array.isArray(dataLines) || dataLines.length === 0) {
-//     // If not, throw an error
-//     throw new Error('Invalid input: dataLines must be a non-empty array');
-//   }
-
-//   // Initialize the total sum to 0
-//   let totalSum = 0;
-//   let lineCount = 1;
-//   const cards = [];
-
-//   // Loop over each line in the dataLines array
-//   for (const line of dataLines) {
-//     const card = parseCard(line, isLoggingEnabled);
-//     cards.push(card);
-//     CARD_INDEXES.push(lineCount);
-//     lineCount++;
-//   }
-
-//   cards.forEach((card) => {
-//     totalSum += card.points;
-//   });
-
-//   recursiveCloneCards(cards, dataLines, CARD_INDEXES, isLoggingEnabled);
-
-//   const counts = CARD_INDEXES.flat().reduce((acc, index) => {
-//     acc[index] = (acc[index] || 0) + 1;
-//     return acc;
-//   }, {});
-
-//   const scratchcards = Object.entries(counts).map(([index, count]) => ({ index: Number(index), count }));
-
-//   const scratchcardsObject = {
-//     scratchcards,
-//     total: scratchcards.reduce((acc, { count }) => acc + count, 0),
-//   };
-
-//   if (isLoggingEnabled) {
-//     console.log('\n', scratchcardsObject);
-//   }
-
-//   return {
-//     part1: totalSum,
-//     part2: scratchcardsObject,
-//   };
-// };
 
 /* MAIN EXECUTION
 ============================================================================= */
@@ -164,8 +43,15 @@ const [solutionSize] = getRuntime(getFileSize, `${process.cwd()}/src/days/${DAY}
 // const [solution, solutionTime] = getRuntime(getWinningCards, dataLines, false);
 // const [solution, solutionTime] = getRuntime(getSolution, exampleData, true);
 
-const solution = new Solution(exampleData, true);
-solution.calculateWinningCards();
+
+console.time("Runtime Part-1");
+const solution = new Solution(exampleData, false);
+solution.part1();
+console.timeEnd("Runtime Part-1");
+console.time("Runtime Part-2");
+solution.part2();
+console.timeEnd("Runtime Part-2");
+
 console.log('\n\n', solution);
 // console.log(solution.cards);
 // console.log('\npart-1:', solution.totalPoints);

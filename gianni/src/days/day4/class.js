@@ -13,14 +13,14 @@ export default class Solution {
   }
 
   // core method
-  calculateWinningCards() {
+
+  part1() {
     if (!Array.isArray(this.dataLines) || this.dataLines.length === 0) {
       throw new Error('Invalid input: dataLines must be a non-empty array');
     }
 
-    // Part-1
     if (this.isLoggingEnabled) {
-      console.log('\ncards\n');
+      console.log('\npart-1:\n');
     }
     const cards = new Array(this.dataLines.length);
     const cardIndexes = new Array(this.dataLines.length);
@@ -32,67 +32,60 @@ export default class Solution {
       this.totalPoints += card.points;
     });
 
+    if (this.isLoggingEnabled) {
+      console.log('total points:', this.totalPoints, '\n')
+    }
+
     this.cards = cards;
-    // this.cardIndexes = cardIndexes;
 
     this.cardIndexes = cards.flatMap((card) => {
       if (card.cardIndexes.length > 0) {
-        return [card.cardIndexes];
+        return card.cardIndexes;
       }
       return [];
     });
+  }
 
+  part2() {
+    if (!Array.isArray(this.dataLines) || this.dataLines.length === 0) {
+      throw new Error('Invalid input: dataLines must be a non-empty array');
+    }
 
-    // Part-2
+    this.cardIndexes = this.cardIndexes.flat();
 
-    // Loop thru all indexes in this.cardIndexes
-    // For each indexGroup, loop thru all indexes
-    // For each index, get the corresponding cardObject from this.cards
-    // For each cardObject, get the cardIndexes
-    // Add the cardIndexes to this.cardIndexes
+    // Call the function
+    this.loopThroughCards();
 
-    console.log('\ninitial card clones:\n\n', this.cardIndexes);
+    const originalCardIndexes = Array.from({ length: this.dataLines.length }, (_, i) => i + 1);
 
-    ///////////////////////
-    // PROBLEM HERE ///////
-    ///////////////////////
+    this.cardIndexes.unshift(originalCardIndexes); // Add the original cardIndexes to the beginning of this.cardIndexes
+    this.cardIndexes = this.cardIndexes.flat(); // Flatten the array
 
-    this.cardIndexes.forEach((indexGroup) => {
-      indexGroup.forEach((index) => {
-        const cardObject = this.cards[index - 1];
-        if (cardObject) {
-          const cardClonesIndexes = cardObject.cardIndexes;
-          if (cardClonesIndexes.length > 0 && cardIndexes.length > 0) {
-            this.cardIndexes = [...this.cardIndexes, [...cardClonesIndexes]];
-            // console.log(groupIndex, indexGroup, cardObject, this.cardIndexes);
-          }
-        }
-      });
-    });
-
-    ///////////////////////
-    ///////////////////////
-
-    console.log('\nafter cloning all: (something goes wrong here)\n\n', this.cardIndexes);
-
-    this.cardIndexes.unshift(cardIndexes); // Add the original cardIndexes to the beginning of this.cardIndexes
-
-    console.log('\nafter adding original card indexes:\n\n', this.cardIndexes);
-
-    const cardInstances = this.cardIndexes.reduce((acc, curr) => {
-      curr.forEach((index) => {
-        if (acc[index]) {
-          acc[index] += 1;
-        } else {
-          acc[index] = 1;
-        }
-      });
+    const indexOverview = this.cardIndexes.reduce((acc, curr) => {
+      acc[curr] = (acc[curr] || 0) + 1;
       return acc;
     }, {});
 
-    const totalSum = Object.values(cardInstances).reduce((a, b) => a + b, 0);
+    this.totalScratchcards = Object.values(indexOverview).reduce((a, b) => a + b, 0);
 
-    console.log('\nindex overview:\n\n', cardInstances, 'total:', totalSum); // Outputs: 24
+    if (this.isLoggingEnabled) {
+      console.log('\npart-2:\n\n', indexOverview, 'total:', this.totalScratchcards); // Outputs: 24
+    }
+  }
+
+  // loopThroughCards main method
+  loopThroughCards() {
+    const queue = [...this.cardIndexes];
+
+    while (queue.length > 0) {
+      const index = queue.shift();
+      const { cardIndexes } = this.cards[index - 1];
+
+      if (cardIndexes.length > 0) {
+        this.cardIndexes.push(...cardIndexes);
+        queue.push(...cardIndexes);
+      }
+    }
   }
 
   // splitCardLine main method
@@ -169,7 +162,11 @@ export default class Solution {
     if (logProperties.isClone) {
       console.log(updatedCardLine);
     } else {
-      console.log(updatedCardLine, `${chalk.blue('points:')} ${chalk.yellow(logProperties.points)}`);
+      if (logProperties.points > 0) {
+        console.log(updatedCardLine, `${chalk.dim.cyan('points:')} ${chalk.yellow(logProperties.points)}`);
+      } else {
+        console.log(updatedCardLine);
+      }
     }
   }
 
@@ -188,6 +185,11 @@ export default class Solution {
   }
 
   highlightMatchingNumbers(cardLine, matchingNumbers) {
+    const [cardName, numbers] = cardLine.split(':');
+    const parts = cardName.split(' ');
+    const cardString = parts.slice(0, -1).join(' ');
+    const cardIndex = parts[parts.length - 1];
+
     if (matchingNumbers.length > 0) {
       const replacements = new Map(matchingNumbers.map((num) => {
         if (num >= 0 && num < 10) { // check if num is a single digit
@@ -195,8 +197,9 @@ export default class Solution {
         }
         return [` ${num}`, ` ${chalk.green(num)}`];
 
-      })); const regex = new RegExp(Array.from(replacements.keys()).join('|'), 'g');
-      return cardLine.replace(regex, match => replacements.get(match));
+      }));
+      const regex = new RegExp(Array.from(replacements.keys()).join('|'), 'g');
+      return `${cardString} ${cardIndex.replace(cardIndex, chalk.yellow(`${cardIndex}:`))}${chalk.grey(numbers.replace(regex, match => replacements.get(match)))}`;
     }
     return cardLine;
   }
