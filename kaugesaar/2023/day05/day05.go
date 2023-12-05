@@ -15,6 +15,11 @@ var fileInput string
 // Solver for day 5 and its both parts
 type Solver struct{}
 
+type Seed struct {
+	Start  int
+	Length int
+}
+
 type Instruction struct {
 	SourceNumber      int
 	DestinationNumber int
@@ -29,6 +34,7 @@ type Map struct {
 
 type Almanac struct {
 	SeedsToBePlanted []int
+	Seeds            []Seed
 	Maps             map[string]Map
 }
 
@@ -40,10 +46,18 @@ func parser() Almanac {
 	almanac.Maps = make(map[string]Map)
 
 	rows := strings.Split(strings.ReplaceAll(fileInput, " map:", ""), "\n")
-	digits := regexp.MustCompile(`\d+`)
+	digitRe := regexp.MustCompile(`\d+`)
+	nums := digitRe.FindAllString(rows[0], -1)
 
-	for _, seed := range digits.FindAllString(rows[0], -1) {
+	for _, seed := range nums {
 		almanac.SeedsToBePlanted = append(almanac.SeedsToBePlanted, utils.ToInt(seed))
+	}
+
+	for i := 0; i < len(nums); i += 2 {
+		almanac.Seeds = append(almanac.Seeds, Seed{
+			Start:  utils.ToInt(nums[i]),
+			Length: utils.ToInt(nums[i+1]),
+		})
 	}
 
 	rows = rows[1:]
@@ -67,7 +81,7 @@ func parser() Almanac {
 		}
 
 		if unicode.IsDigit(rune(row[0])) {
-			nums := digits.FindAllString(row, -1)
+			nums := digitRe.FindAllString(row, -1)
 			destStart := utils.ToInt(nums[0])
 			sourceStart := utils.ToInt(nums[1])
 			length := utils.ToInt(nums[2])
@@ -95,9 +109,21 @@ func plant(sourceNumber int, m Map) int {
 	return sourceNumber
 }
 
-func isInRange(a, b, len int) bool {
-	if a+len > b {
-		return true
+func reversePlant(destNumber int, m Map) int {
+	for _, ins := range m.Instructions {
+		if destNumber >= ins.DestinationNumber && destNumber < ins.DestinationNumber+ins.Length {
+			offset := destNumber - ins.DestinationNumber
+			return ins.SourceNumber + offset
+		}
+	}
+	return destNumber
+}
+
+func isValidSeed(a Almanac, seed int) bool {
+	for _, s := range a.Seeds {
+		if seed >= s.Start && seed < s.Start+s.Length {
+			return true
+		}
 	}
 	return false
 }
@@ -123,7 +149,28 @@ func p1() string {
 }
 
 func p2() string {
-	return ""
+	almanac := parser()
+
+	min := int(^uint(0) >> 1)
+	testLocation := 0
+
+	for min == int(^uint(0)>>1) {
+		humidity := reversePlant(testLocation, almanac.Maps["humidity-to-location"])
+		temperature := reversePlant(humidity, almanac.Maps["temperature-to-humidity"])
+		light := reversePlant(temperature, almanac.Maps["light-to-temperature"])
+		water := reversePlant(light, almanac.Maps["water-to-light"])
+		fertilizer := reversePlant(water, almanac.Maps["fertilizer-to-water"])
+		soil := reversePlant(fertilizer, almanac.Maps["soil-to-fertilizer"])
+		seed := reversePlant(soil, almanac.Maps["seed-to-soil"])
+
+		if isValidSeed(almanac, seed) {
+			min = testLocation
+		}
+
+		testLocation++
+	}
+
+	return utils.ToStr(min)
 }
 
 // Part1 the solution for part 1, day 5
