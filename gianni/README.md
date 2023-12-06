@@ -23,13 +23,6 @@ This project is a collaborative effort between the developer and GitHub Copilot
 - `npm run -s start:min:day -- 1` Run specific day from minified code
 - `npm run docs` Create documentation of functions that have JSdoc comments
 
-## Tasks
-- Attempt to find online solutions for Day 3, Day 5, and Day 6. and refactor it into a class
-
-## Pending tasks, if time permits 
-- Enhance JSDocs: Include console log in examples when `isLoggingEnabled` is true.
-- Improve JSDocs: Ensure all examples in the documentation are accurate and up-to-date.
-
 ## Updates
 
 #### Day 1
@@ -74,4 +67,15 @@ This project is a collaborative effort between the developer and GitHub Copilot
 - Standardized all logs for consistency.
 - Refactored all `index.js` files to align with Day 1's `index.js`.
 - Resolved a bug in Day 1 example part-1 logging where characters were being removed.
+- UPDATE DAY 4: Used a javascript version of https://github.com/Lyqst/aoc2023/ and converted it to my needs its way way faster now i didnt know you can split data like that. Went from 30min to 2ms HUGE CHANGE
 
+#### Day 7 
+
+###### Tasks
+- Enhance JSDocs: Include console log in examples when `isLoggingEnabled` is true.
+- Improve JSDocs: Ensure all examples in the documentation are accurate and up-to-date.
+- Attempt to find online solutions for missing days. and refactor it into a class
+
+#### Day 8 
+
+- WINTER PARTY!!!

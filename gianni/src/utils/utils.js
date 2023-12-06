@@ -64,10 +64,9 @@ const getFileSize = (filePath) => {
  */
 const getRuntime = (func) => {
   const t0 = performance.now();
-  func();
+  const result = func();
   const t1 = performance.now();
   let time = t1 - t0; // time in milliseconds
-
   let unit = 'ms';
   if (time > 1000) {
     time /= 1000; // convert to seconds
@@ -81,7 +80,6 @@ const getRuntime = (func) => {
       }
     }
   }
-
   return `${time.toFixed(2)} ${unit}`;
 };
 

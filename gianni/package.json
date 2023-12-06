@@ -18,6 +18,7 @@
     "@babel/eslint-parser": "^7.18.9",
     "better-docs": "^2.7.2",
     "chalk": "^5.3.0",
+    "cli-spinner": "^0.2.10",
     "cross-var": "^1.1.0",
     "eslint": "^7.31.0",
     "eslint-config-airbnb": "^19.0.4",

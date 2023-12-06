@@ -14,14 +14,13 @@ import('./class.js').then((module) => {
   ============================================================================= */
 
   // The data for the current day is loaded.
-  const { /* data: dataLines, */ size: dataSize } = get.dataAndSize('data.txt', day);
+  const { data: dataLines, size: dataSize } = get.dataAndSize('data.txt', day);
   const { data: exampleLines } = get.dataAndSize('example-data.txt', day);
   const { size: classSize } = get.dataAndSize('class.js', day);
 
   // A new instance of the class for the current day is created.
   // The time it takes to calculate the solution for part 1 and part 2 is measured.
-  const solution = new DayClass(exampleLines, false); // change to dataLines for actual result but takes 30min or longer
-  solution.time = solution.time || {};
+  const solution = new DayClass(dataLines, false); // change to dataLines for actual result but takes 30min or longer
   solution.time.part1 = get.runtime(() => solution.part1());
   solution.time.part2 = get.runtime(() => solution.part2());
 
@@ -29,7 +28,7 @@ import('./class.js').then((module) => {
   ============================================================================= */
 
   // The day and results are logged to the console.
-  log.message(`\n${'🎄'.repeat(DayNumber)} ⭐⭐ ⭐⭐ ❌❌ ⭐⭐ (Uses example data due to long processing time.)\n`);
+  log.message(`\n${'🎄'.repeat(DayNumber)} ⭐⭐ ⭐⭐ ❌❌ ⭐⭐\n`);
   log.results(day, classSize, dataSize, solution);
 
   // Present box separator

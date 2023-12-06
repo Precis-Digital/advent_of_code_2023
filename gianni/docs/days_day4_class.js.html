@@ -85,34 +85,34 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/* eslint-disable no-underscore-dangle */
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
 
 import chalk from 'chalk';
 
 /**
+ * The Day4 class processes data lines for a card game.
  * @class
- *
- * @property {Array} dataLines - The data lines.
- * @property {Array} cards - The cards.
- * @property {boolean} isLoggingEnabled - Whether logging is enabled.
- * @property {Array} cardIndexes - The card indexes.
- * @property {number} totalPoints - The total points.
- * @property {number} totalScratchcards - The total scratchcards.
+ * @example
+ * const dataLines = [
+ *   "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
+ * ];
+ * const isLoggingEnabled = true;
+ * const day4 = new Day4(dataLines, isLoggingEnabled);
+ * console.log(day4); // logs the new instance of the Day4 class
  */
 export class Day4 {
+
   /**
-   * @param {Array} dataLines - The data lines.
+   * Constructs a new instance of the Day4 class.
+   * @constructor
+   * @param {Array&lt;string>} dataLines - The data lines to process.
    * @param {boolean} isLoggingEnabled - Whether logging is enabled.
-   *
-   * @example
-   * const solution = new Day4(dataLines, true);
    */
   constructor(dataLines, isLoggingEnabled) {
     this.dataLines = dataLines;
-    this.cards = [];
     this.isLoggingEnabled = isLoggingEnabled;
-    this.cardIndexes = [];
+    this.time = {};
     this.totalSum = {
       part1: 0,
       part2: 0,
@@ -120,334 +120,208 @@ export class Day4 {
   }
 
   /**
-   * Processes the first part of the solution.
-   * Parses the card lines, calculates the total points, and prepares the card indexes.
-   *
-   * @throws {Error} If the dataLines property is not a non-empty array.
+   * Processes the data lines and calculates the sum for part 1.
+   * @method
    * @example
-   * solution.part1();
+   * const dataLines = [
+   *   "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
+   * ];
+   * const isLoggingEnabled = true;
+   * const day4 = new Day4(dataLines, isLoggingEnabled);
+   * day4.part1();
+   * console.log(day4.totalSum.part1);
    */
   part1() {
-    if (!Array.isArray(this.dataLines) || this.dataLines.length === 0) {
-      throw new Error('Invalid input: dataLines must be a non-empty array');
-    }
+    const sum = this.dataLines.reduce((total, card) => {
+      const [_, sides] = this.splitCard(card);
+      const [leftList, rightList] = this.splitSides(sides);
+      const leftArray = this.splitList(leftList);
+      const rightArray = this.splitList(rightList);
+      const winningNumbers = this.findWinningNumbers(leftArray, rightArray);
 
-    this.processCards();
-
-    this.totalSum.part1 = this.cards.reduce((sum, card) => sum + card.points, 0);
-
-    if (this.isLoggingEnabled) {
-      this.cards.forEach((card) => {
+      if (this.isLoggingEnabled) {
         const logProperties = {
-          matchingNumbers: card.matchingNumbers,
-          points: card.points,
-          isClone: card.isClone,
+          winningNumbers,
+          total,
         };
-        const cardLine = this.dataLines[card.index - 1];
-        this.logCard(cardLine, logProperties);
-      });
-    }
-
+        this.logCard(card, logProperties);
+      }
+      return winningNumbers.length > 0 ? total + 2 ** (parseInt(winningNumbers.length, 10) - 1) : total;
+    }, 0);
+    this.totalSum.part1 = sum;
   }
 
   /**
-   * Processes the second part of the solution.
-   * Loops through the cards, calculates the total scratchcards, and logs the index overview.
-   *
-   * @throws {Error} If the dataLines property is not a non-empty array.
+   * Processes the data lines and calculates the sum for part 1.
+   * @method
    * @example
-   * solution.part2();
+   * const dataLines = [
+   *   "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
+   * ];
+   * const isLoggingEnabled = true;
+   * const day4 = new Day4(dataLines, isLoggingEnabled);
+   * day4.part2();
+   * console.log(day4.totalSum.part1);
    */
   part2() {
-    if (!Array.isArray(this.dataLines) || this.dataLines.length === 0) {
-      throw new Error('Invalid input: dataLines must be a non-empty array');
-    }
-
-    this.processCards();
-
-    this.cardIndexes = this.cardIndexes.flat();
-
-    // Call the function
-    this.loopThroughCards();
-
-    const originalCardIndexes = Array.from({ length: this.dataLines.length }, (_, i) => i + 1);
-
-    this.cardIndexes.unshift(originalCardIndexes); // Add the original cardIndexes to the beginning of this.cardIndexes
-    this.cardIndexes = this.cardIndexes.flat(); // Flatten the array
-
-    const indexOverview = this.cardIndexes.reduce((acc, curr) => {
-      acc[curr] = (acc[curr] || 0) + 1;
-      return acc;
-    }, {});
-
-    this.totalSum.part2 = Object.values(indexOverview).reduce((a, b) => a + b, 0);
-
-    if (this.isLoggingEnabled) {
-      console.log(indexOverview);
-    }
-  }
-
-  // Common method to process cards
-  processCards() {
-    const cards = new Array(this.dataLines.length);
-    const cardIndexes = new Array(this.dataLines.length);
-
-    this.dataLines.forEach((cardLine, index) => {
-      const card = this.parseCard(cardLine);
-      cards[index] = card;
-      cardIndexes[index] = index + 1;
+    const instances = Array.from({ length: this.dataLines.length }, () => 1);
+    this.dataLines.forEach((card) => {
+      const [tag, sides] = this.splitCard(card);
+      const cardNumber = parseInt(tag.split(/[ ]+/)[1], 10);
+      const [leftList, rightList] = this.splitSides(sides);
+      const leftArray = this.splitList(leftList);
+      const rightArray = this.splitList(rightList);
+      const winningNumbers = this.findWinningNumbers(leftArray, rightArray);
+      for (let i = 0; i &lt; winningNumbers.length; i++) {
+        if (cardNumber + i &lt; instances.length) {
+          instances[cardNumber + i] = instances[cardNumber + i] + instances[cardNumber - 1];
+        }
+      }
+      if (this.isLoggingEnabled) {
+        const logProperties = {
+          winningNumbers,
+          instances,
+          total: instances.reduce((total, instance) => total + instance, 0),
+        };
+        this.logCard(card, logProperties);
+      }
     });
 
-    this.cards = cards;
-
-    this.cardIndexes = cards.flatMap((card) => {
-      if (card.cardIndexes.length > 0) {
-        return card.cardIndexes;
-      }
-      return [];
-    });
+    this.totalSum.part2 = instances.reduce((total, instance) => total + instance, 0);
   }
 
   /**
-   * This method loops through the card indexes and processes each one.
-   *
+   * Splits a card string into two parts based on the pattern ': '
+   * @param {string} card - The card string to split.
+   * @returns {Array&lt;string>} The split card string.
    * @example
-   * solution.loopThroughCards();
+   * const card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53";
+   * const splitCard = splitCard(card);
+   * console.log(splitCard); // ["Card 1", "41 48 83 86 17 | 83 86  6 31 17  9 48 53"]
    */
-  loopThroughCards() {
-    const queue = [...this.cardIndexes];
-
-    while (queue.length > 0) {
-      const index = queue.shift();
-      const { cardIndexes } = this.cards[index - 1];
-
-      if (cardIndexes.length > 0) {
-        this.cardIndexes.push(...cardIndexes);
-        queue.push(...cardIndexes);
-      }
-    }
-  }
+  splitCard(card) { return card.split(/[:][ ]+/); }
 
   /**
-  * This method splits a card line into its constituent parts.
-  *
-  * @param {string} cardLine - The card line to split.
-  * @returns {Array} The split card line.
-  *
-  * @example
-  * const cardLine = "1 2 3 4 5";
-  * const splitLine = solution.splitCard(cardLine);
-  * console.log(splitLine); // Outputs: ["1", "2", "3", "4", "5"]
-  */
-  splitCard(cardLine) {
-    const { cardIndexPart, winnerNumberPart, myNumberPart } = this.splitCardIntoParts(cardLine);
-    const index = this.splitCardIndexFromPart(cardIndexPart);
-    const winnerNumbers = this.splitCardNumbersFromPart(winnerNumberPart);
-    const myNumbers = this.splitCardNumbersFromPart(myNumberPart);
-
-    return {
-      index,
-      winnerNumbers,
-      myNumbers,
-    };
-  }
-
-  /**
-   * This method splits a card line into its constituent parts.
-   *
-   * @param {string} cardLine - The card line to be split.
-   * @returns {Array.&lt;string>} The parts of the card line.
-   *
+   * Splits a sides string into two parts based on the pattern ' | '
+   * @param {string} sides - The sides string to split.
+   * @returns {Array&lt;string>} The split sides string.
    * @example
-   * const cardLine = "1 2 3 4 5";
-   * const parts = solution.splitCardIntoParts(cardLine);
-   * console.log(parts); // Outputs: ["part1", "part2", "part3"]
+   * const sides = "41 48 83 86 17 | 83 86  6 31 17  9 48 53";
+   * const splitSides = splitSides(sides);
+   * console.log(splitSides); // ["41 48 83 86 17", "83 86  6 31 17  9 48 53"]
    */
-  splitCardIntoParts(cardLine) {
-    const [cardIndexPart, numbersPart] = cardLine.split(': ');
-    const [winnerNumberPart, myNumberPart] = numbersPart.split(' | ');
-    return { cardIndexPart, winnerNumberPart, myNumberPart };
-  }
+  splitSides(sides) { return sides.split(/[ ]+[|][ ]+/); }
 
   /**
-   * This method splits the card index from a part.
-   *
-   * @param {string} cardIndexPart - The part to extract the index from.
-   * @returns {number} The extracted index.
-   *
+   * Splits a list string into an array of numbers.
+   * @param {string} list - The list string to split.
+   * @returns {Array&lt;number>} The split list as an array of numbers.
    * @example
-   * let index = splitCardIndexFromPart("card 4");
-   * console.log(index); // Outputs: 4
+   * const list = "41 48 83 86 17";
+   * const splitList = splitList(list);
+   * console.log(splitList); // [41, 48, 83, 86, 17]
    */
-  splitCardIndexFromPart(cardIndexPart) {
-    const indexArray = cardIndexPart.split(' ');
-    const index = Number(indexArray[indexArray.length - 1]);
-    return index;
-  }
+  splitList(list) { return list.split(/[ ]+/); }
 
   /**
-   * This method splits the card numbers from a part.
-   *
-   * @param {string} numberPart - The part to extract the numbers from.
-   * @returns {Array.&lt;number>} The extracted numbers.
-   *
+   * Finds the numbers that are present in both arrays.
+   * @param {Array&lt;number>} leftArray - The first array of numbers.
+   * @param {Array&lt;number>} rightArray - The second array of numbers.
+   * @returns {Array&lt;number>} The numbers that are present in both arrays.
    * @example
-   * let numbers = splitCardNumbersFromPart("1 2 3 4 5");
-   * console.log(numbers); // Outputs: [1, 2, 3, 4, 5]
+   * const leftArray = [41, 48, 83, 86, 17];
+   * const rightArray = [83, 86,  6, 31, 17,  9, 48, 53];
+   * const winningNumbers = findWinningNumbers(leftArray, rightArray);
+   * console.log(winningNumbers); // [41, 48, 83, 86, 17]
    */
-  splitCardNumbersFromPart(numberPart) {
-    return numberPart.split(' ').filter(item => item !== '').map(Number);
-  }
+  findWinningNumbers(leftArray, rightArray) { return leftArray.filter(number => rightArray.includes(number)); }
 
   /**
-   * Parses a card line into its constituent parts.
-   *
-   * @param {string} cardLine - The card line to be parsed.
-   * @param {boolean} isClone - A flag indicating whether the card is a clone.
-   * @returns {Object} An object containing the parsed parts of the card line.
-   *
+   * Logs the card with its properties.
+   * @param {string} card - The card string to log.
+   * @param {Object} logProperties - The properties to log with the card.
    * @example
-   * let parsedCard = parseCard("card 4: 1 2 3 4 5", false);
-   * console.log(parsedCard); // Outputs: { index: 4, points: 2, cardIndexes: [1, 2, 3, 4, 5] }
+   * const card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53";
+   * const logProperties = { winningNumbers: [41, 48, 83, 86, 17], total: 225 };
+   * logCard(card, logProperties); // logs the card with its properties
    */
-  parseCard(cardLine, isClone = false) {
-    const parsedData = this.splitCard(cardLine);
-    const matchingNumbers = this.parseCardMatchingNumbers(parsedData.winnerNumbers, parsedData.myNumbers);
-    const points = this.parseCardPoints(matchingNumbers);
-    const cardIndexes = this.parseCardIndexes(Number(parsedData.index), matchingNumbers.length);
+  logCard(card, logProperties) {
 
-    return {
-      index: parsedData.index,
-      points,
-      cardIndexes,
-      matchingNumbers,
-    };
-  }
-
-  /**
-   * This method parses the matching numbers from a card.
-   *
-   * @param {Array.&lt;number>} winnerNumbers - The winning numbers.
-   * @param {Array.&lt;number>} myNumbers - The player's numbers.
-   * @returns {Array.&lt;number>} The matching numbers.
-   *
-   * @example
-   * let matchingNumbers = parseCardMatchingNumbers([1, 2, 3, 4, 5], [2, 3, 6, 7, 8]);
-   * console.log(matchingNumbers); // Outputs: [2, 3]
-   */
-  parseCardMatchingNumbers(winnerNumbers, myNumbers) {
-    const winnerNumbersSet = new Set(winnerNumbers);
-    return myNumbers.filter(num => winnerNumbersSet.has(num));
-  }
-
-  /**
-   * This method parses the points from a card.
-   *
-   * @param {Array.&lt;number>} matchingNumbers - The matching numbers.
-   * @returns {number} The total points.
-   *
-   * @example
-   * let points = parseCardPoints([2, 3]);
-   * console.log(points); // Outputs: 2
-   */
-  parseCardPoints(matchingNumbers) {
-    return matchingNumbers.length > 0 ? 2 ** (matchingNumbers.length - 1) : 0;
-  }
-
-  /**
-   * This method parses the indexes from a card.
-   *
-   * @param {number} index - The starting index.
-   * @param {number} length - The length of the array to generate.
-   * @returns {Array.&lt;number>} The indexes.
-   *
-   * @example
-   * let indexes = parseCardIndexes(0, 5);
-   * console.log(indexes); // Outputs: [1, 2, 3, 4, 5]
-   */
-  parseCardIndexes(index, length) {
-    return Array.from({ length }, (_, i) => i + index + 1);
-  }
-
-  /**
-   * Logs the card line with updates and points if applicable.
-   *
-   * @param {string} cardLine - The card line to log.
-   * @param {Object} logProperties - The properties to use for logging.
-   * @param {Array.&lt;number>} logProperties.matchingNumbers - The matching numbers.
-   * @param {boolean} logProperties.isClone - A flag indicating whether the card is a clone.
-   * @param {number} logProperties.points - The points earned.
-   *
-   * @example
-   * logCard("Card 4: 1 2 3 4 5", { matchingNumbers: [2, 3], isClone: false, points: 2 });
-   * // Outputs: "Card 4: 1 2 3 4 5 points: 2" with 2 and 3 highlighted
-   */
-  logCard(cardLine, logProperties) {
-    const updatedCardLine = this.logCardLineUpdate(cardLine, logProperties.matchingNumbers);
-    if (logProperties.isClone) {
-      console.log(updatedCardLine);
-    } else if (logProperties.points > 0) {
-      console.log(updatedCardLine, `${chalk.dim.cyan('points:')} ${chalk.yellow(logProperties.points)}`);
+    const updatedCardLine = this.logCardLineUpdate(card, logProperties.winningNumbers);
+    if (logProperties.winningNumbers.length > 0 &amp;&amp; !logProperties.instances) {
+      console.log(
+        updatedCardLine,
+        `${chalk.dim.cyan('points:')} ${chalk.yellow(logProperties.winningNumbers.length)}`,
+        `${chalk.dim.cyan('total:')} ${chalk.yellow(logProperties.total)}`,
+      );
+    } else if (logProperties.instances) {
+      console.log(
+        updatedCardLine,
+        `${chalk.dim.cyan('instances:')} ${chalk.yellow(logProperties.instances)}`,
+        `${chalk.dim.cyan('total:')} ${chalk.yellow(logProperties.total)}`,
+      );
     } else {
       console.log(updatedCardLine);
     }
   }
 
+
   /**
-   * This method logs the update of a card line.
-   *
-   * @param {string} cardLine - The card line to update.
-   * @param {Array.&lt;number>} matchingNumbers - The matching numbers.
+   * Updates the card line for logging.
+   * @param {string} card - The card string to update.
+   * @param {Array&lt;number>} winningNumbers - The winning numbers to highlight in the card.
    * @returns {string} The updated card line.
-   *
    * @example
-   * let updatedLine = logCardLineUpdate("Card 4: 1 2 3 4 5", [2, 3]);
-   * console.log(updatedLine); // Outputs: "Card 4: 1 2 3 4 5" with 2 and 3 highlighted
+   * const card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53";
+   * const winningNumbers = [41, 48, 83, 86, 17];
+   * const updatedCardLine = logCardLineUpdate(card, winningNumbers);
+   * console.log(updatedCardLine); // logs the updated card line
    */
-  logCardLineUpdate(cardLine, matchingNumbers) {
-    const cardColor = matchingNumbers.length > 0 ? chalk.green : chalk.red;
-    let updatedCardLine = this.logCardColorUpdate(cardLine, cardColor, matchingNumbers);
-    updatedCardLine = this.logCardNumberHighlight(updatedCardLine, matchingNumbers);
+  logCardLineUpdate(card, winningNumbers) {
+    const cardColor = winningNumbers.length > 0 ? chalk.green : chalk.red;
+    let updatedCardLine = this.logCardColorUpdate(card, cardColor, winningNumbers);
+    updatedCardLine = this.logCardNumberHighlight(updatedCardLine, winningNumbers);
     return updatedCardLine;
   }
 
   /**
-   * This method logs the update of a card color.
-   *
-   * @param {string} cardLine - The card line to update.
-   * @param {string} cardColor - The color to update.
-   * @param {Array.&lt;number>} matchingNumbers - The matching numbers.
-   * @returns {string} The updated card line.
-   *
-   * @example
-   * let updatedLine = logCardColorUpdate("Card 4: 1 2 3 4 5", chalk.green, [2, 3]);
-   * console.log(updatedLine); // Outputs: "Card 4: 1 2 3 4 5" in green color
-   */
-  logCardColorUpdate(cardLine, cardColor, matchingNumbers) {
-    return matchingNumbers.length > 0
-      ? cardLine.replace('Card', cardColor('Card'))
-      : cardLine.replace(cardLine, cardColor(cardLine));
+ * Updates the card color for logging.
+ * @param {string} card - The card string to update.
+ * @param {Function} cardColor - The chalk color function to use.
+ * @param {Array&lt;number>} winningNumbers - The winning numbers to check.
+ * @returns {string} The updated card color.
+ * @example
+ * const card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53";
+ * const cardColor = chalk.green;
+ * const winningNumbers = [41, 48, 83, 86, 17];
+ * const updatedCardColor = logCardColorUpdate(card, cardColor, winningNumbers);
+ * console.log(updatedCardColor); // logs the updated card color
+ */
+  logCardColorUpdate(card, cardColor, winningNumbers) {
+    return winningNumbers.length > 0
+      ? card.replace('Card', cardColor('Card'))
+      : card.replace(card, cardColor(card));
   }
 
   /**
-   * This method logs the highlight of matching numbers.
-   *
-   * @param {string} cardLine - The card line to highlight.
-   * @param {Array.&lt;number>} matchingNumbers - The matching numbers.
-   * @returns {string} The highlighted card line.
-   *
-   * @example
-   * let highlightedLine = logCardNumberHighlight("Card 4: 1 2 3 4 5", [2, 3]);
-   * console.log(highlightedLine); // Outputs: "Card 4: 1 2 3 4 5" with 2 and 3 highlighted
-   */
-  logCardNumberHighlight(cardLine, matchingNumbers) {
-    const [cardName, numbers] = cardLine.split(':');
+ * Highlights the winning numbers in the card for logging.
+ * @param {string} card - The card string to update.
+ * @param {Array&lt;number>} winningNumbers - The winning numbers to highlight.
+ * @returns {string} The card with the winning numbers highlighted.
+ * @example
+ * const card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53";
+ * const winningNumbers = [41, 48, 83, 86, 17];
+ * const highlightedCard = logCardNumberHighlight(card, winningNumbers);
+ * console.log(highlightedCard); // logs the card with the winning numbers highlighted
+ */
+  logCardNumberHighlight(card, winningNumbers) {
+    const [cardName, numbers] = card.split(':');
     const parts = cardName.split(' ');
     const cardString = parts.slice(0, -1).join(' ');
     const cardIndex = parts[parts.length - 1];
 
-    if (matchingNumbers.length > 0) {
-      const replacements = new Map(matchingNumbers.map((num) => {
+    if (winningNumbers.length > 0) {
+      const replacements = new Map(winningNumbers.map((num) => {
         if (num >= 0 &amp;&amp; num &lt; 10) { // check if num is a single digit
           return [`  ${num}`, `  ${chalk.green(`${num}`)}`];
         }
@@ -457,7 +331,7 @@ export class Day4 {
       const regex = new RegExp(Array.from(replacements.keys()).join('|'), 'g');
       return `${cardString} ${cardIndex.replace(cardIndex, chalk.yellow(`${cardIndex}:`))}${chalk.grey(numbers.replace(regex, match => replacements.get(match)))}`;
     }
-    return cardLine;
+    return card;
   }
 }
 </code></pre>
