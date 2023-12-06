@@ -21,52 +21,61 @@ type Card struct {
 	WinningNumbers []int
 }
 
-var digitRegex = regexp.MustCompile(`\d+`)
-
 func parser() []Card {
-	var cards []Card
-	rows := strings.Split(fileInput, "\n")
+	doubleSpaces := regexp.MustCompile(`\s{2,}`)
+	rows := strings.Split(doubleSpaces.ReplaceAllString(fileInput, " "), "\n")
 
-	for _, row := range rows {
-		numbers := strings.Split(row, ": ")[1]
+	cards := make([]Card, len(rows))
+
+	for i, row := range rows {
 		var card Card
-		for i, set := range strings.Split(numbers, " | ") {
-			split := digitRegex.FindAllString(set, -1)
-			for _, s := range split {
-				if i == 0 {
-					card.Numbers = append(card.Numbers, utils.ToInt(s))
-				} else {
-					card.WinningNumbers = append(card.WinningNumbers, utils.ToInt(s))
-				}
-			}
-		}
-		cards = append(cards, card)
+		parts := strings.SplitN(row, ": ", 2)
+		ticketParts := strings.SplitN(parts[1], " | ", 2)
+
+		card.Numbers = parseNumbers(ticketParts[0])
+		card.WinningNumbers = parseNumbers(ticketParts[1])
+		cards[i] = card
 	}
 
 	return cards
 }
 
+func parseNumbers(input string) []int {
+	numStrs := strings.Split(input, " ")
+	nums := make([]int, len(numStrs))
+
+	for i, numStr := range numStrs {
+		nums[i] = utils.ToInt(numStr)
+	}
+
+	return nums
+}
+
 func p1() string {
 	sum := 0
 	cards := parser()
+
 	for _, card := range cards {
-		matches := 0
+		wins := 0
 		points := 0
 		for _, n := range card.Numbers {
 			if slices.Contains(card.WinningNumbers, n) {
-				points = int(math.Pow(float64(2), float64(matches)))
-				matches++
+				points = int(math.Pow(float64(2), float64(wins)))
+				wins++
 			}
 		}
 		sum += points
 	}
+
 	return utils.ToStr(sum)
 }
 
 func p2() string {
 	cards := parser()
-	nWins := make(map[int]int)
-	instances := make(map[int]int)
+	copies := make([]int, len(cards))
+	for i := range copies {
+		copies[i] = 1
+	}
 
 	for i, card := range cards {
 		wins := 0
@@ -75,39 +84,18 @@ func p2() string {
 				wins++
 			}
 		}
-		nWins[i] = wins
-		instances[i] = 1
-	}
-
-	var copies []int
-	for i := range nWins {
-		copies = append(copies, i)
-	}
-
-	for len(copies) != 0 {
-		card := copies[0]
-		wins := nWins[card]
-		for _, c := range getCardsFrom(card+1, card+wins) {
-			instances[c]++
-			copies = append(copies, c)
+		for j := 0; j < wins; j++ {
+			// "Cards will never make you copy a card past the end of the table."
+			copies[i+j+1] += copies[i]
 		}
-		copies = copies[1:]
 	}
 
-	sum := 0
-	for _, n := range instances {
-		sum += n
+	sumCopies := 0
+	for _, v := range copies {
+		sumCopies += v
 	}
 
-	return utils.ToStr(sum)
-}
-
-func getCardsFrom(min, max int) []int {
-	cards := make([]int, max-min+1)
-	for i := range cards {
-		cards[i] = min + i
-	}
-	return cards
+	return utils.ToStr(sumCopies)
 }
 
 // Part1 the solution for part 1, day 4
