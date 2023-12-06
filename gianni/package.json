@@ -5,11 +5,11 @@
   "description": "",
   "main": "",
   "scripts": {
-    "start": "for dir in src/days/*/; do node ${dir}solution.js; done",
-    "start:min": "npm run -s minify && for dir in src/days/*/; do node ${dir}solution.min.js; done",
-    "start:min:day": "npm run -s minify && node -e 'require(`child_process`).execSync(`node ./src/days/day${process.argv[1]}/solution.min.js`, { stdio: [0, 1, 2] })'",
-    "start:day": "node -e 'require(`child_process`).execSync(`node ./src/days/day${process.argv[1]}/solution.js`, { stdio: [0, 1, 2] })'",
-    "minify": "for dir in src/days/*/; do uglifyjs ${dir}solution.js -c drop_console=true -m --no-annotations --toplevel -o ${dir}solution.min.js; done",
+    "start": "for dir in src/days/*/; do node ${dir}index.js; done",
+    "start:min": "npm run -s minify && for dir in src/days/*/; do node ${dir}index.min.js; done",
+    "start:min:day": "npm run -s minify && node -e 'require(`child_process`).execSync(`node ./src/days/day${process.argv[1]}/index.min.js`, { stdio: [0, 1, 2] })'",
+    "start:day": "node -e 'require(`child_process`).execSync(`node ./src/days/day${process.argv[1]}/index.js`, { stdio: [0, 1, 2] })'",
+    "minify": "for file in $(find ./src -name '*.js' ! -name '*.min.js'); do uglifyjs $file -c drop_console=true -m --no-annotations --toplevel -o ${file%.js}.min.js; sed -i '' -e 's/class.js/class.min.js/g' ${file%.js}.min.js; sed -i '' -e 's/utils.js/utils.min.js/g' ${file%.js}.min.js; done",
     "docs": "jsdoc -c jsdoc.json -t ./node_modules/better-docs"
   },
   "author": "Gianni Marsiglia",

@@ -3,6 +3,8 @@ node_modules
 *-assets
 .DS_Store
 
+*.min.js
+
 # Software settings
 package-lock.json
 

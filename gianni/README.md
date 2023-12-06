@@ -22,3 +22,56 @@ This project is a collaborative effort between the developer and GitHub Copilot
 - `npm run -s start:min` Run all days from minified code
 - `npm run -s start:min:day -- 1` Run specific day from minified code
 - `npm run docs` Create documentation of functions that have JSdoc comments
+
+## Tasks
+- Attempt to find online solutions for Day 3, Day 5, and Day 6. and refactor it into a class
+
+## Pending tasks, if time permits 
+- Enhance JSDocs: Include console log in examples when `isLoggingEnabled` is true.
+- Improve JSDocs: Ensure all examples in the documentation are accurate and up-to-date.
+
+## Updates
+
+#### Day 1
+- Collaborated with CoPilot on this challenge.
+- Faced some difficulties in devising a solution for part 2.
+- Eventually, we successfully solved the problem.
+- CoPilot suggested an almost optimized solution when I wrote a repeatable solution for part 2.
+- After some adjustments, we achieved the final result.
+
+#### Day 2
+- This challenge significantly tested my coding skills.
+- Also had to work through a hangover.
+- Managed to overcome the difficulties with the help of a Red Bull.
+- Successfully completed the challenge.
+- Ready to tackle the next challenge.
+
+#### Day 3
+- Encountered significant difficulties in finding a solution.
+- Still working on part 1; plan to revisit this later.
+- Experienced similar challenges last year without finding a solution.
+- The example data works, but the real data does not.
+- Encountering issues with false positives and negatives.
+- Some numbers are not being detected.
+
+#### Day 4
+- Completed part-1 rather quickly.
+- Struggled with part-2, especially due to the initially long runtime of 30 seconds.
+- After rewriting, the runtime unexpectedly increased to 30 minutes.
+- Despite the increased runtime, the refactored code has a cleaner appearance.
+- Began refactoring tasks for previous days.
+
+#### Day 5
+- Unable to make progress on this day.
+
+#### Day 6
+- Implemented minification for classes and `index.js`, ensuring correct functionality.
+- System now determines the day based on the folder name.
+- Developed classes for Day 1 and Day 2.
+- Reintroduced logging in Day 2 class if `isLoggingEnabled` is true.
+- Refactored `index.js` for Day 2 and added JSDoc comments to the Day 2 class.
+- Considered integrating `processDataLines` into Day 4 or making it a helper function.
+- Standardized all logs for consistency.
+- Refactored all `index.js` files to align with Day 1's `index.js`.
+- Resolved a bug in Day 1 example part-1 logging where characters were being removed.
+
