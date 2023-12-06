@@ -4,9 +4,7 @@ import (
 	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
-	"regexp"
 	"strings"
-	"unicode"
 )
 
 //go:embed day5.txt
@@ -16,158 +14,133 @@ var fileInput string
 type Solver struct{}
 
 type Seed struct {
-	Start  int
-	Length int
+	Start int
+	End   int
 }
 
-type Instruction struct {
-	SourceNumber      int
-	DestinationNumber int
-	Length            int
-}
-
-type Map struct {
-	Source       string
-	Destination  string
-	Instructions []Instruction
+type Level struct {
+	Source      int
+	Destination int
+	Length      int
 }
 
 type Almanac struct {
-	SeedsToBePlanted []int
-	Seeds            []Seed
-	Maps             map[string]Map
+	Seeds     []int
+	Levels    [][]Level
+	SeedPairs []Seed
 }
 
 func parser() Almanac {
-	var almanac Almanac
-	var mapName string
-	var currentMap Map
+	var a Almanac
 
-	almanac.Maps = make(map[string]Map)
+	fileInput = strings.ReplaceAll(fileInput, "\n\r", "\n\n")
+	parts := strings.SplitN(fileInput, "\n\n", 2)
 
-	rows := strings.Split(strings.ReplaceAll(fileInput, " map:", ""), "\n")
-	digitRe := regexp.MustCompile(`\d+`)
-	nums := digitRe.FindAllString(rows[0], -1)
+	seeds := strings.Fields(parts[0])[1:]
 
-	for _, seed := range nums {
-		almanac.SeedsToBePlanted = append(almanac.SeedsToBePlanted, utils.ToInt(seed))
+	for _, seed := range seeds {
+		a.Seeds = append(a.Seeds, utils.ToInt(seed))
 	}
 
-	for i := 0; i < len(nums); i += 2 {
-		almanac.Seeds = append(almanac.Seeds, Seed{
-			Start:  utils.ToInt(nums[i]),
-			Length: utils.ToInt(nums[i+1]),
+	for i := 0; i < len(a.Seeds); i += 2 {
+		a.SeedPairs = append(a.SeedPairs, Seed{
+			Start: a.Seeds[i],
+			End:   a.Seeds[i] + a.Seeds[i+1],
 		})
 	}
 
-	rows = rows[1:]
-
-	for i, row := range rows {
-
-		if mapName != "" && row == "" || len(rows) == i+1 {
-			almanac.Maps[mapName] = currentMap
-			currentMap = Map{}
+	for _, level := range strings.Split(parts[1], "\n\n") {
+		var levels []Level
+		for _, row := range strings.SplitN(level, "\n", -1)[1:] {
+			nums := strings.Fields(row)
+			if len(nums) > 2 {
+				levels = append(levels, Level{
+					Source:      utils.ToInt(nums[1]),
+					Destination: utils.ToInt(nums[0]),
+					Length:      utils.ToInt(nums[2]),
+				})
+			}
 		}
-
-		if row == "" {
-			continue
-		}
-
-		if unicode.IsLetter(rune(row[0])) {
-			splits := strings.Split(row, "-")
-			mapName = row
-			currentMap.Source = splits[0]
-			currentMap.Destination = splits[2]
-		}
-
-		if unicode.IsDigit(rune(row[0])) {
-			nums := digitRe.FindAllString(row, -1)
-			destStart := utils.ToInt(nums[0])
-			sourceStart := utils.ToInt(nums[1])
-			length := utils.ToInt(nums[2])
-			currentMap.Instructions = append(currentMap.Instructions, Instruction{
-				SourceNumber:      sourceStart,
-				DestinationNumber: destStart,
-				Length:            length,
-			})
-		}
-
+		a.Levels = append(a.Levels, levels)
 	}
 
-	return almanac
-}
-
-func plant(sourceNumber int, m Map) int {
-
-	for _, ins := range m.Instructions {
-		if sourceNumber >= ins.SourceNumber && sourceNumber < ins.SourceNumber+ins.Length {
-			offset := sourceNumber - ins.SourceNumber
-			return ins.DestinationNumber + offset
-		}
-	}
-
-	return sourceNumber
-}
-
-func reversePlant(destNumber int, m Map) int {
-	for _, ins := range m.Instructions {
-		if destNumber >= ins.DestinationNumber && destNumber < ins.DestinationNumber+ins.Length {
-			offset := destNumber - ins.DestinationNumber
-			return ins.SourceNumber + offset
-		}
-	}
-	return destNumber
-}
-
-func isValidSeed(a Almanac, seed int) bool {
-	for _, s := range a.Seeds {
-		if seed >= s.Start && seed < s.Start+s.Length {
-			return true
-		}
-	}
-	return false
+	return a
 }
 
 func p1() string {
-	almanac := parser()
+	a := parser()
 
-	min := int(^uint(0) >> 1)
+	seeds := make([]int, len(a.Seeds))
 
-	for _, seed := range almanac.SeedsToBePlanted {
-		soil := plant(seed, almanac.Maps["seed-to-soil"])
-		fertilizer := plant(soil, almanac.Maps["soil-to-fertilizer"])
-		water := plant(fertilizer, almanac.Maps["fertilizer-to-water"])
-		light := plant(water, almanac.Maps["water-to-light"])
-		temperature := plant(light, almanac.Maps["light-to-temperature"])
-		humidity := plant(temperature, almanac.Maps["temperature-to-humidity"])
-		location := plant(humidity, almanac.Maps["humidity-to-location"])
-
-		min = utils.MinInt(min, location)
+	for i, seed := range a.Seeds {
+		for _, level := range a.Levels {
+			for _, l := range level {
+				if seed >= l.Source && seed < l.Source+l.Length {
+					offset := seed - l.Source
+					seed = l.Destination + offset
+					break
+				}
+			}
+			seeds[i] = seed
+		}
 	}
+
+	min := utils.MinArr(seeds)
 
 	return utils.ToStr(min)
 }
 
 func p2() string {
-	almanac := parser()
+	a := parser()
 
-	min := int(^uint(0) >> 1)
-	testLocation := 0
+	pairs := a.SeedPairs
 
-	for min == int(^uint(0)>>1) {
-		humidity := reversePlant(testLocation, almanac.Maps["humidity-to-location"])
-		temperature := reversePlant(humidity, almanac.Maps["temperature-to-humidity"])
-		light := reversePlant(temperature, almanac.Maps["light-to-temperature"])
-		water := reversePlant(light, almanac.Maps["water-to-light"])
-		fertilizer := reversePlant(water, almanac.Maps["fertilizer-to-water"])
-		soil := reversePlant(fertilizer, almanac.Maps["soil-to-fertilizer"])
-		seed := reversePlant(soil, almanac.Maps["seed-to-soil"])
+	for _, level := range a.Levels {
+		var newPairs []Seed
 
-		if isValidSeed(almanac, seed) {
-			min = testLocation
+		for _, sp := range pairs {
+			var mapped []Seed
+			unmapped := []Seed{{sp.Start, sp.End}}
+
+			for _, l := range level {
+				var m []Seed
+
+				for _, um := range unmapped {
+					low := Seed{um.Start, utils.MinInt(um.End, l.Source)}
+					mid := Seed{utils.MaxInt(um.Start, l.Source), utils.MinInt(um.End, l.Source+l.Length)}
+					high := Seed{utils.MaxInt(um.Start, l.Source+l.Length), um.End}
+
+					if low.Start < low.End {
+						m = append(m, low)
+					}
+
+					if mid.Start < mid.End {
+						mapped = append(mapped, Seed{
+							Start: mid.Start - l.Source + l.Destination,
+							End:   mid.End - l.Source + l.Destination,
+						})
+					}
+
+					if high.Start < high.End {
+						m = append(m, high)
+					}
+				}
+
+				unmapped = m
+			}
+
+			newPairs = append(newPairs, mapped...)
+			newPairs = append(newPairs, unmapped...)
 		}
 
-		testLocation++
+		pairs = newPairs
+	}
+
+	min := pairs[0].Start
+	for _, pair := range pairs {
+		if pair.Start < min {
+			min = pair.Start
+		}
 	}
 
 	return utils.ToStr(min)
@@ -176,7 +149,7 @@ func p2() string {
 // Part1 the solution for part 1, day 5
 func (s Solver) Part1() solution.Response {
 	return solution.Response{
-		Day:    3,
+		Day:    5,
 		Part:   1,
 		Answer: p1(),
 	}
@@ -185,7 +158,7 @@ func (s Solver) Part1() solution.Response {
 // Part2 the solution for part 2, day 5
 func (s Solver) Part2() solution.Response {
 	return solution.Response{
-		Day:    3,
+		Day:    5,
 		Part:   2,
 		Answer: p2(),
 	}

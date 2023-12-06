@@ -1,0 +1,35 @@
+package day{DISPLAY_DAY}
+
+import (
+	"kaugesaar-aoc/solution"
+	"kaugesaar-aoc/utils"
+)
+
+// Solver for day {DAY} and its both parts
+type Solver struct{}
+
+func p1() string {
+	return utils.ToStr(1)
+}
+
+func p2() string {
+	return utils.ToStr(2)
+}
+
+// Part1 the solution for part 1, day {DAY}
+func (s Solver) Part1() solution.Response {
+	return solution.Response{
+		Day:    {DAY},
+		Part:   1,
+		Answer: p1(),
+	}
+}
+
+// Part2 the solution for part 2, day {DAY}
+func (s Solver) Part2() solution.Response {
+	return solution.Response{
+		Day:    {DAY},
+		Part:   2,
+		Answer: p2(),
+	}
+}
