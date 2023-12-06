@@ -66,7 +66,9 @@ class Alamanac:
             for seed_range in seed_ranges
         ]
 
-    def traverse_maps[T: (int, range)](self, initial: list[T], /) -> list[T]:
+    def traverse_maps[
+        T: (int, range)
+    ](self, initial: list[T], /) -> list[T] | list[list[T]]:
         result = initial
         for map_ in self.maps:
             result = [map_[key] for key in result]
