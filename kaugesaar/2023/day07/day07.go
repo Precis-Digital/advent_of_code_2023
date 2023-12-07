@@ -2,7 +2,6 @@ package day07
 
 import (
 	_ "embed"
-	"fmt"
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"sort"
@@ -81,7 +80,11 @@ func getHandType(counts []int) int {
 	case max == 1:
 		return nothing
 	default:
-		panic(fmt.Sprintf("%v", counts))
+		// Todays lesson: don't return nothing just because, "why would it even matter".
+		// Apparently if you don't read the instructions wll enough, you assume that the
+		// most valueable hand is four of a kind, like in poker. But in a game of Camel
+		// Cards there obviously is five of a kind...Who would have thought...
+		panic("should be unreachable")
 	}
 }
 
