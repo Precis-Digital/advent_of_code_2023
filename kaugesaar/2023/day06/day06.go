@@ -3,6 +3,7 @@ package day06
 import (
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
+	"math"
 )
 
 type Race struct {
@@ -25,14 +26,11 @@ var races2 = []Race{
 type Solver struct{}
 
 func countWaysToWin(race Race) int {
-	ways := 0
-	for i := 0; i < race.Time; i++ {
-		distance := i * (race.Time - i)
-		if distance > race.Distance {
-			ways++
-		}
-	}
-	return ways
+	diff := math.Sqrt(float64(race.Time*race.Time - 4*race.Distance))
+	min := (float64(race.Time) - diff) / 2.0
+	max := (float64(race.Time) + diff) / 2.0
+
+	return int(math.Floor(max)-math.Ceil(min)) + 1
 }
 
 func p1() string {
