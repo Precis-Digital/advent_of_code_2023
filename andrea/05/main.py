@@ -10,6 +10,7 @@ re_map_ranges = re.compile(r'^(\d+) (\d+) (\d+)')
 
 print_progress = False
 
+
 class SeedMap:
     def __init__(self,
                  *,
