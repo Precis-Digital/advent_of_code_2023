@@ -24,7 +24,7 @@ type Solver struct{}
 //go:embed day7.txt
 var fileInput string
 
-func cardIndex(c rune) int {
+func cardIndex(c rune, isPartTwo bool) int {
 	switch c {
 	case 'A':
 		return 14
@@ -33,6 +33,9 @@ func cardIndex(c rune) int {
 	case 'Q':
 		return 12
 	case 'J':
+		if isPartTwo {
+			return 1
+		}
 		return 11
 	case 'T':
 		return 10
@@ -41,7 +44,7 @@ func cardIndex(c rune) int {
 	}
 }
 
-func getHandType(counts []int) int {
+func getHandType(counts []int, jokers int) int {
 	max := 0
 	for _, count := range counts {
 		if count > max {
@@ -50,10 +53,10 @@ func getHandType(counts []int) int {
 	}
 
 	switch {
-	case max == 5:
+	case max+jokers == 5:
 		return fiveOfAKind
 
-	case max == 4:
+	case max+jokers == 4:
 		return fourOfAKind
 
 	case max == 3:
@@ -72,26 +75,33 @@ func getHandType(counts []int) int {
 			}
 		}
 		switch {
-		case pairs == 2:
+		case pairs == 2 && jokers == 1:
+			return fullHouse
+		case pairs == 1 && jokers == 1:
+			return threeOfAKind
+		case pairs == 2 && jokers == 0:
 			return twoPair
 		default:
 			return pair
 		}
-	case max == 1:
-		return nothing
+	case max == 1 && jokers == 2:
+		return threeOfAKind
+	case max == 1 && jokers == 1:
+		return pair
 	default:
-		// Todays lesson: don't return nothing just because, "why would it even matter".
-		// Apparently if you don't read the instructions wll enough, you assume that the
-		// most valueable hand is four of a kind, like in poker. But in a game of Camel
-		// Cards there obviously is five of a kind...Who would have thought...
-		panic("should be unreachable")
+		return nothing
 	}
 }
 
-func handStrength(cards string) (int, int) {
+func handStrength(cards string, isPartTwo bool) (int, int) {
+	jokers := 0
 	countsByCard := make(map[rune]int)
 	for _, c := range cards {
-		countsByCard[c]++
+		if isPartTwo && c == 'J' {
+			jokers++
+		} else {
+			countsByCard[c]++
+		}
 	}
 
 	counts := make([]int, 0, len(countsByCard))
@@ -101,13 +111,13 @@ func handStrength(cards string) (int, int) {
 
 	idx := 0
 	for _, c := range cards {
-		idx = (idx << 4) + cardIndex(c)
+		idx = (idx << 4) + cardIndex(c, isPartTwo)
 	}
 
-	return getHandType(counts), idx
+	return getHandType(counts, jokers), idx
 }
 
-func parser() [][]int {
+func parser(isPartTwo bool) [][]int {
 	rows := strings.Split(fileInput, "\n")
 	hands := make([][]int, 0)
 	for _, row := range rows {
@@ -118,12 +128,11 @@ func parser() [][]int {
 		hand := make([]int, 3)
 		parts := strings.Split(row, " ")
 
-		hand[0], hand[1] = handStrength(parts[0])
+		hand[0], hand[1] = handStrength(parts[0], isPartTwo)
 		hand[2] = utils.ToInt(parts[1])
 		hands = append(hands, hand)
 	}
 
-	// Sorting the hands slice
 	sort.Slice(hands, func(i, j int) bool {
 		if hands[i][0] == hands[j][0] {
 			return hands[i][1] < hands[j][1]
@@ -136,7 +145,7 @@ func parser() [][]int {
 
 func p1() string {
 	sum := 0
-	hands := parser()
+	hands := parser(false)
 
 	for i, hand := range hands {
 		sum += hand[2] * (i + 1)
@@ -146,7 +155,14 @@ func p1() string {
 }
 
 func p2() string {
-	return utils.ToStr(2)
+	sum := 0
+	hands := parser(true)
+
+	for i, hand := range hands {
+		sum += hand[2] * (i + 1)
+	}
+
+	return utils.ToStr(sum)
 }
 
 // Part1 the solution for part 1, day 7
