@@ -40,7 +40,6 @@ class HandType(enum.Enum):
 class Hand:
     bid: int
     cards: tuple[Card, ...]
-    jokers: bool = False
 
     @functools.cached_property
     def type(self) -> HandType:
