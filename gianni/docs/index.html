@@ -66,7 +66,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day4.html">Day4</a></li></ul><h3>Global</h3><ul><li><a href="global.html#replaceLastOccurrence">replaceLastOccurrence</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day4.html">Day4</a></li></ul><h3>Global</h3><ul><li><a href="global.html#replaceLastOccurrence">replaceLastOccurrence</a></li><li><a href="global.html#splitLine">splitLine</a></li></ul></div>
                 
             </nav>
         </div>
@@ -126,16 +126,6 @@
 <li><code>npm run -s start:min:day -- 1</code> Run specific day from minified code</li>
 <li><code>npm run docs</code> Create documentation of functions that have JSdoc comments</li>
 </ul>
-<h2>Tasks</h2>
-<ul>
-<li>day 4 update class JSDoc comments</li>
-<li>Attempt to find online solutions for Day 3, Day 5, and Day 6. and refactor it into a class</li>
-</ul>
-<h2>Pending tasks, if time permits</h2>
-<ul>
-<li>Enhance JSDocs: Include console log in examples when <code>isLoggingEnabled</code> is true.</li>
-<li>Improve JSDocs: Ensure all examples in the documentation are accurate and up-to-date.</li>
-</ul>
 <h2>Updates</h2>
 <h4>Day 1</h4>
 <ul>
@@ -176,37 +166,45 @@
 </ul>
 <h4>Day 6</h4>
 <ul>
+<li>Implemented minification for classes and <code>index.js</code>, ensuring correct functionality.</li>
+<li>System now determines the day based on the folder name.</li>
+<li>Developed classes for Day 1 and Day 2.</li>
+<li>Reintroduced logging in Day 2 class if <code>isLoggingEnabled</code> is true.</li>
+<li>Refactored <code>index.js</code> for Day 2 and added JSDoc comments to the Day 2 class.</li>
+<li>Considered integrating <code>processDataLines</code> into Day 4 or making it a helper function.</li>
+<li>Standardized all logs for consistency.</li>
+<li>Refactored all <code>index.js</code> files to align with Day 1's <code>index.js</code>.</li>
+<li>Resolved a bug in Day 1 example part-1 logging where characters were being removed.</li>
+<li>UPDATE DAY 4: Used a javascript version of https://github.com/Lyqst/aoc2023/ and converted it to my needs its way way faster now i didnt know you can split data like that. Went from 30min to 2ms HUGE CHANGE</li>
+</ul>
+<h4>Day 7</h4>
+<h6>Tasks</h6>
+<ul>
 <li>
-<p>Implemented minification for classes and <code>index.js</code>, ensuring correct functionality.</p>
+<p>day 2 need lines to be logged not its only result</p>
 </li>
 <li>
-<p>System now determines the day based on the folder name.</p>
+<p>Attempt to find online solutions for missing days. and refactor it into a class</p>
 </li>
 <li>
-<p>Developed classes for Day 1 and Day 2.</p>
+<p>Enhance JSDocs: Include console log in examples when <code>isLoggingEnabled</code> is true.</p>
 </li>
 <li>
-<p>Reintroduced logging in Day 2 class if <code>isLoggingEnabled</code> is true.</p>
+<p>Improve JSDocs: Ensure all examples in the documentation are accurate and up-to-date.</p>
 </li>
-<li>
-<p>Refactored <code>index.js</code> for Day 2 and added JSDoc comments to the Day 2 class.</p>
-</li>
-<li>
-<p>Considered integrating <code>processDataLines</code> into Day 4 or making it a helper function.</p>
-</li>
-<li>
-<p>Standardized all logs for consistency.</p>
-</li>
-<li>
-<p>Refactored all <code>index.js</code> files to align with Day 1's <code>index.js</code>.</p>
-</li>
-<li>
-<p>Resolved a bug in Day 1 example part-1 logging where characters were being removed.</p>
-</li>
-<li>
-<p>UPDATE DAY 4: Used a javascript version of https://github.com/Lyqst/aoc2023/ and converted it to my needs its way way faster now i didnt know you can split data like that. Went from 30min to 2ms HUGE CHANGE</p>
-</li>
-</ul></article>
+</ul>
+<h4>Day 8</h4>
+<ul>
+<li>WINTER PARTY!!!</li>
+</ul>
+<p>change the color in let side;
+if number in let side is low enough or equal to this.availableCubes;
+then color the number with chalk.red(number) or chalk.green(number);</p>
+<p>input: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+use: let minimumCubesNeed(input) ouput: { red: 4, green: 2, blue: 6 }
+use: minimumCubesNeed output:  { red: 4, green: 2, blue: 6 }
+tocheck: input vs minimumCubesNeed</p>
+<p>chalk.green(3) blue, chalk.green(4) red; chalk.green(1) red, chalk.green(2) green,chalk.green(6) blue; chalk.green(2) green</p></article>
     </section>
 
 

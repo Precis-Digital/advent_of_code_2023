@@ -146,6 +146,24 @@ const logExecute = (DayClass, partNumber, lines) => {
   console.log(`${chalk.blue('Runtime:')} ${chalk.green(`${runtime}`)}\n`);
 };
 
+
+// SPLIT
+
+/**
+   * Splits a card string into two parts based on the pattern ': '
+   * @param {string} card - The card string to split.
+   * @returns {Array<string>} The split card string.
+   * @example
+   * const card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53";
+   * const splitCard = splitCard(card);
+   * console.log(splitCard); // ["Card 1", "41 48 83 86 17 | 83 86  6 31 17  9 48 53"]
+   */
+const splitLine = (line) => {
+  const [tags, ...rest] = line.split(/[:][ ]+/);
+  const [tag, number] = tags.split(' ');
+  return [tag, parseInt(number, 10), ...rest];
+};
+
 // EXPORTS
 
 const get = {
@@ -159,6 +177,10 @@ const replace = {
   lastOccurrence: replaceLastOccurrence,
 };
 
+const split = {
+  line: splitLine,
+};
+
 const log = {
   message: logMessage,
   results: logResults,
@@ -170,5 +192,5 @@ const process = {
 };
 
 export {
-  get, replace, log, process,
+  get, replace, split, log, process,
 };

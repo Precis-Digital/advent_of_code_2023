@@ -21,6 +21,13 @@ export class Day4 {
    * @constructor
    * @param {Array<string>} dataLines - The data lines to process.
    * @param {boolean} isLoggingEnabled - Whether logging is enabled.
+   * @example
+   * const dataLines = [
+   *   "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
+   * ];
+   * const isLoggingEnabled = true;
+   * const day4 = new Day4(dataLines, isLoggingEnabled);
+   * console.log(day4); // logs the new instance of the Day4 class
    */
   constructor(dataLines, isLoggingEnabled) {
     this.dataLines = dataLines;

@@ -71,11 +71,24 @@ This project is a collaborative effort between the developer and GitHub Copilot
 
 #### Day 7 
 
-###### Tasks
-- Enhance JSDocs: Include console log in examples when `isLoggingEnabled` is true.
-- Improve JSDocs: Ensure all examples in the documentation are accurate and up-to-date.
-- Attempt to find online solutions for missing days. and refactor it into a class
+- Rewrote Day 2
+- Made solution for day 3 with help from https://github.com/Lyqst/aoc2023/ but had to refactor code to work for my logs.
 
 #### Day 8 
 
+- Turned Day 3 into a class
+- added extra logging to day 3
+
 - WINTER PARTY!!!
+
+
+#### Day 9
+
+###### Tasks
+
+- Clean up / optimize
+- Attempt to find online solutions for missing days 5,6,7,8. and refactor it into a class
+- Enhance JSDocs: Include console log in examples when `isLoggingEnabled` is true.
+- Improve JSDocs: Ensure all examples in the documentation are accurate and up-to-date.
+- Add story and the problem/solution in comments
+

@@ -33,6 +33,7 @@ export class Day1 {
   constructor(dataLines, isLoggingEnabled) {
     this.dataLines = dataLines;
     this.isLoggingEnabled = isLoggingEnabled;
+    this.maxLineLength = Math.max(...this.dataLines.map(line => line.length));
     this.numericWords = [
       { word: 'one', number: 1 },
       { word: 'two', number: 2 },
@@ -120,15 +121,21 @@ export class Day1 {
     const finalWord = this.findNumeric(line, numbersOnly, 'backward');
     const number = parseInt(`${initialWord.number}${finalWord.number}`, 10);
 
+    if (numbersOnly === 'numberOnly') {
+      this.totalSum.part1 += number;
+    } else {
+      this.totalSum.part2 += number;
+    }
+
     if (this.isLoggingEnabled) {
       const initialWordValue = initialWord.type === 'word' ? initialWord.word : initialWord.number;
       const finalWordValue = finalWord.type === 'word' ? finalWord.word : finalWord.number;
+
+      line = line.padEnd(this.maxLineLength, ' ');
       line = line.replace(initialWordValue, `${chalk.redBright(initialWordValue)}`);
       line = chalk.grey(replace.lastOccurrence(line, finalWordValue, `${chalk.cyanBright(finalWordValue)}`));
-      console.log(line, number);
+      console.log(line, chalk.blue('points:'), number, chalk.blue('total:'), numbersOnly === 'numberOnly' ? this.totalSum.part1 : this.totalSum.part2);
     }
-
-    return number;
   }
 
   /**
@@ -142,7 +149,7 @@ export class Day1 {
    */
   part1() {
     process.lines(this.dataLines, (line) => {
-      this.totalSum.part1 += this.processLine(line, 'numberOnly');
+      this.processLine(line, 'numberOnly');
     });
     if (this.isLoggingEnabled) {
       console.log('');
@@ -160,7 +167,7 @@ export class Day1 {
    */
   part2() {
     process.lines(this.dataLines, (line) => {
-      this.totalSum.part2 += this.processLine(line, 'all');
+      this.processLine(line, 'all');
     });
     if (this.isLoggingEnabled) {
       console.log('');

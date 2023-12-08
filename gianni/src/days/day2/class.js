@@ -1,36 +1,37 @@
+/* eslint-disable class-methods-use-this */
 // import chalk from 'chalk';
-import { process } from '../../utils/utils.js';
+import chalk from 'chalk';
+import { process, split } from '../../utils/utils.js';
 
 /**
- * @class
+ * The Day2 class represents a game with a series of sets of colored cubes.
  *
- * @description Represents a day in a game. It holds the game details and performs operations related to the game.
+ * @property {Array<string>} dataLines - An array of strings, each representing a game. Each game is represented as a series of sets of cubes, separated by semicolons. Each set of cubes is represented as a series of cube counts, separated by commas. Each cube count is represented as a number followed by a color (red, green, or blue).
+ * @property {boolean} isLoggingEnabled - A boolean indicating whether logging is enabled.
+ * @property {number} maxLineLength - The maximum length of a line in the dataLines array.
+ * @property {Object} availableCubes - An object representing the available cubes, with properties for red, green, and blue cubes.
+ * @property {Object} totalSum - An object representing the total sum of cubes, with properties for part1 and part2.
  *
- * @property {Array} dataLines - The lines of data for the game.
- * @property {boolean} isLoggingEnabled - Whether logging is enabled.
- * @property {Object} availableCubes - The available cubes in the game.
- * @property {Array} colors - The colors in the game.
- * @property {Object} gameDetailsArray - The details of the game.
- * @property {Object} gamePowerArray - The power of the game.
- * @property {number} totalSum - The total sum of the numbers.
+ * @example
+ * const dataLines = [
+ *   "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
+ * ];
+ * const day2 = new Day2(dataLines);
+ * console.log(day2);
  */
 export class Day2 {
   /**
-   * Creates a new day.
+   * Creates an instance of the Day2 class.
    *
-   * @example
-   * const day2 = new Day2(dataLines, true);
+   * @param {Array<string>} dataLines - An array of strings, each representing a game. Each game is represented as a series of sets of cubes, separated by semicolons. Each set of cubes is represented as a series of cube counts, separated by commas. Each cube count is represented as a number followed by a color (red, green, or blue).
+   * @param {boolean} isLoggingEnabled - A boolean indicating whether logging is enabled.
    *
-   * @param {Array} dataLines - The lines of data for the game.
-   * @param {boolean} isLoggingEnabled - Whether logging is enabled.
    */
   constructor(dataLines, isLoggingEnabled) {
     this.dataLines = dataLines;
     this.isLoggingEnabled = isLoggingEnabled;
+    this.maxLineLength = Math.max(...this.dataLines.map(line => line.length));
     this.availableCubes = { red: 12, green: 13, blue: 14 };
-    this.colors = ['red', 'green', 'blue'];
-    this.gameDetailsArray = {};
-    this.gamePowerArray = {};
     this.totalSum = {
       part1: 0,
       part2: 0,
@@ -38,46 +39,48 @@ export class Day2 {
   }
 
   /**
-   * This function prepares a cube set by sorting it according to the colors.
-   *
-   * @param {object} cubeSet - The original cube set. For example, {red: 2, green: 3, blue: 1}.
-   * @returns {object} The sorted cube set. For example, {blue: 1, green: 3, red: 2}.
-   *
+   * Returns a string representation of the available cubes.
+   * @returns {string} A string representation of the available cubes.
    * @example
-   * prepareCubeSet({red: 2, green: 3, blue: 1}); // returns {blue: 1, green: 3, red: 2}
+   * const game = new Game();
+   * const availableCubesString = game.getAvailableCubesString();
+   * console.log(availableCubesString);
    */
-  prepareCubeSet(cubeSet) {
-    return this.colors.reduce((sortedCubeSet, key) => {
-      sortedCubeSet[key] = cubeSet[key] || 0;
-      return sortedCubeSet;
-    }, {});
+  getAvailableCubesString() {
+    return Object.entries(this.availableCubes)
+      .map(([color, quantity]) => `${chalk[color](color)} ${chalk.yellow(`${quantity}`.padEnd(3, ' '))}`)
+      .join(' ');
   }
 
   /**
-   * This function checks if there are enough cubes in the game object.
-   *
-   * @param {object} gameObject - The game object.
-   * @returns {boolean} True if there are enough cubes, false otherwise.
-   *
+   * Returns an array of game sets from a given side string.
+   * @param {string} side - The side string to process.
+   * @returns {Array} An array of game sets.
    * @example
-   * checkIfThereIsEnoughCubes(gameObject); // returns true or false
+   * const game = new Game();
+   * const gameSets = game.getGameSets("3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
+   * console.log(gameSets);
    */
-  checkIfThereIsEnoughCubes(gameObject) {
-    return !gameObject.sets.some(set => !Object.keys(set).every(color => set[color] <= this.availableCubes[color]));
+  getGameSets(side) {
+    return side.split(/\s*;\s*/).map(group => group.split(/\s*,\s*/).reduce((acc, pair) => {
+      const [quantity, color] = pair.split(/\s+/);
+      acc[color] = parseInt(quantity, 10);
+      return acc;
+    }, { red: 0, green: 0, blue: 0 }));
   }
 
   /**
-   * This function calculates the minimum number of cubes needed for each color in the game object.
-   *
-   * @param {object} gameObject - The game object.
-   * @returns {object} The minimum number of cubes needed for each color.
-   *
+   * Returns an object representing the minimum cubes needed for the game sets.
+   * @param {Array} gameSets - The game sets to process.
+   * @returns {Object} An object representing the minimum cubes needed.
    * @example
-   * minimumCubesNeeded(gameObject); // returns {red: 2, green: 3, blue: 1}
+   * const game = new Game();
+   * const minimumCubesNeeded = game.getMinimumCubesNeeded([{red: 3, green: 2, blue: 1}, {red: 1, green: 2, blue: 3}]);
+   * console.log(minimumCubesNeeded);
    */
-  minimumCubesNeeded(gameObject) {
-    return gameObject.sets.reduce((acc, set) => {
-      this.colors.forEach((color) => {
+  getMinimumCubesNeeded(gameSets) {
+    return gameSets.reduce((acc, set) => {
+      ['red', 'green', 'blue'].forEach((color) => {
         acc[color] = Math.max(acc[color] || 0, set[color] || 0);
       });
       return acc;
@@ -85,110 +88,128 @@ export class Day2 {
   }
 
   /**
-   * This function parses a set group into a cube set.
-   *
-   * @param {array} setGroup - The set group. For example, ['2 red', '3 green', '1 blue'].
-   * @returns {object} The cube set. For example, {red: 2, green: 3, blue: 1}.
-   *
+   * Checks if there are enough cubes for the game sets.
+   * @param {Array} gameSets - The game sets to check.
+   * @returns {boolean} True if there are enough cubes, false otherwise.
    * @example
-   * parseSetGroup(['2 red', '3 green', '1 blue']); // returns {red: 2, green: 3, blue: 1}
+   * const game = new Game();
+   * const hasEnoughCubes = game.hasEnoughCubes([{red: 3, green: 2, blue: 1}, {red: 1, green: 2, blue: 3}]);
+   * console.log(hasEnoughCubes);
    */
-  parseSetGroup(setGroup) {
-    const cubeSet = {};
-    setGroup.forEach((color) => {
-      const [cubeAmount, cubeColor] = color.trim().split(' ');
-      cubeSet[cubeColor] = parseInt(cubeAmount, 10);
-    });
-    return this.prepareCubeSet(cubeSet);
+  hasEnoughCubes(gameSets) {
+    return !gameSets.some(set => !Object.keys(set).every(color => set[color] <= this.availableCubes[color]));
   }
 
   /**
-   * This function parses a game from a line.
-   *
-   * @param {string} line - The line. For example, 'Game 1: 2 red, 3 green, 1 blue'.
-   * @returns {object} The game object.
-   *
+   * Returns a colored tag based on whether there are enough cubes.
+   * @param {string} tag - The tag to color.
+   * @param {boolean} hasEnoughCubes - Whether there are enough cubes.
+   * @returns {string} The colored tag.
    * @example
-   * parseGameFromLine('Game 1: 2 red, 3 green, 1 blue'); // returns game object
+   * const game = new Game();
+   * const coloredTag = game.colorTag("Game 1", true);
+   * console.log(coloredTag);
    */
-  parseGameFromLine(line) {
-    const [gameString, setsString] = line.split(':');
-    const game = gameString.split(' ');
-    const gameIndex = parseInt(game[game.length - 1], 10);
-    const sets = setsString.split(';');
-    const gameObject = { line, index: gameIndex, sets: [] };
-
-    sets.forEach((set) => {
-      const setGroup = set.trim().split(',');
-      gameObject.sets.push(this.parseSetGroup(setGroup));
-    });
-
-    gameObject.hasEnoughCubes = this.checkIfThereIsEnoughCubes(gameObject);
-    gameObject.minimumCubesNeeded = this.minimumCubesNeeded(gameObject);
-
-    return gameObject;
+  colorTag(tag, hasEnoughCubes) {
+    return hasEnoughCubes ? chalk.green(tag) : chalk.red(tag);
   }
 
   /**
-   * This function processes the data lines for part 1 of the game.
-   *
+   * Returns a colored side string based on the available cubes.
+   * @param {string} side - The side string to color.
+   * @returns {string} The colored side string.
    * @example
-   * part1(); // processes the data lines for part 1
+   * const game = new Game();
+   * const coloredSide = game.colorSide("3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
+   * console.log(coloredSide);
+   */
+  colorSide(side) {
+    return side.replace(/(\d+)\s+(\w+)/g, (match, quantity, color) => {
+      const num = parseInt(quantity, 10);
+      return num <= this.availableCubes[color] ? `${chalk.green(num)} ${chalk.gray(color)}` : `${chalk.red(num)} ${chalk.gray(color)}`;
+    });
+  }
+
+  /**
+   * Returns a colored string representation of the minimum cubes needed.
+   * @param {Object} minimumCubesNeeded - The minimum cubes needed.
+   * @returns {string} The colored string representation.
+   * @example
+   * const game = new Game();
+   * const coloredMinimumCubesNeeded = game.colorMinimumCubesNeeded({red: 3, green: 2, blue: 1});
+   * console.log(coloredMinimumCubesNeeded);
+   */
+  colorMinimumCubesNeeded(minimumCubesNeeded) {
+    return Object.entries(minimumCubesNeeded)
+      .map(([color, quantity]) => `${chalk[color](color)} ${chalk.yellow(`${quantity}`.padEnd(3, ' '))}`)
+      .join(' ');
+  }
+
+  /**
+   * Processes the part 1 of the game.
+   * @example
+   * const game = new Game();
+   * game.part1();
    */
   part1() {
+    const availableCubesString = this.getAvailableCubesString();
+    if (this.isLoggingEnabled) console.log('Available cubes:', availableCubesString, '\n');
+
     process.lines(this.dataLines, (line) => {
-      // Parse the game from the line
-      const gameObject = this.parseGameFromLine(line);
-
-      // If the game has enough cubes, add its index to the total sum of indexes
-      if (gameObject.hasEnoughCubes) {
-        this.totalSum.part1 += gameObject.index;
+      let [tag, index, side] = split.line(line.padEnd(this.maxLineLength, ' '));
+      const gameSets = this.getGameSets(side);
+      let minimumCubesNeeded = this.getMinimumCubesNeeded(gameSets);
+      const hasEnoughCubes = this.hasEnoughCubes(gameSets);
+      tag = this.colorTag(tag, hasEnoughCubes);
+      side = this.colorSide(side);
+      minimumCubesNeeded = this.colorMinimumCubesNeeded(minimumCubesNeeded);
+      const points = hasEnoughCubes ? index : 0;
+      this.totalSum.part1 += points;
+      if (this.isLoggingEnabled) {
+        console.log(
+          tag,
+          `${chalk.yellow(index)}:`,
+          side,
+          minimumCubesNeeded,
+          hasEnoughCubes ? '✅ ' : '❌ ',
+          `${chalk.blue('points:')} ${chalk.yellow(`${points}`.padEnd(3, ' '))}`,
+          `${chalk.blue('total:')} ${chalk.yellow(`${this.totalSum.part1}`.padEnd(2, ' '))}`,
+        );
       }
-
-      // Add the game details to the array
-      this.gameDetailsArray[gameObject.index] = gameObject.hasEnoughCubes ? '✅' : '❌';
-
     });
-    // If logging is enabled, log the game details
-    if (this.isLoggingEnabled) {
-      console.log(this.gameDetailsArray);
-    }
   }
 
   /**
-   * This function processes the data lines for part 2 of the game.
-   *
+   * Processes the part 2 of the game.
    * @example
-   * part2(); // processes the data lines for part 2
+   * const game = new Game();
+   * game.part2();
    */
   part2() {
+    const availableCubesString = this.getAvailableCubesString();
+    if (this.isLoggingEnabled) console.log('Available cubes:', availableCubesString, '\n');
+
     process.lines(this.dataLines, (line) => {
-      // Parse the game from the line
-      const gameObject = this.parseGameFromLine(line);
-
-      // Calculate the power of the game
-      gameObject.power = gameObject.minimumCubesNeeded.red * gameObject.minimumCubesNeeded.green * gameObject.minimumCubesNeeded.blue;
-
-      // Add the power of the game to the total sum of power
-      this.totalSum.part2 += gameObject.power;
-
-      this.gamePowerArray[gameObject.index] = gameObject.power;
-
+      let [tag, index, side] = split.line(line.padEnd(this.maxLineLength, ' '));
+      const gameSets = this.getGameSets(side);
+      let minimumCubesNeeded = this.getMinimumCubesNeeded(gameSets);
+      const hasEnoughCubes = this.hasEnoughCubes(gameSets);
+      const power = minimumCubesNeeded.red * minimumCubesNeeded.green * minimumCubesNeeded.blue;
+      this.totalSum.part2 += power;
+      tag = this.colorTag(tag, hasEnoughCubes);
+      side = this.colorSide(side);
+      minimumCubesNeeded = this.colorMinimumCubesNeeded(minimumCubesNeeded);
+      if (this.isLoggingEnabled) {
+        console.log(
+          tag,
+          `${chalk.yellow(index)}:`,
+          side,
+          minimumCubesNeeded,
+          hasEnoughCubes ? '✅ ' : '❌ ',
+          `${chalk.blue('points:')} ${chalk.yellow(`${power}`.padEnd(4, ' '))}`,
+          `${chalk.blue('total:')} ${chalk.yellow(`${this.totalSum.part2}`.padEnd(2, ' '))}`,
+        );
+      }
     });
-    // If logging is enabled, log the game details
-    if (this.isLoggingEnabled) {
-      console.log(this.gamePowerArray);
-    }
   }
 }
-
-
-
-
-
-
-
-
-
-
-

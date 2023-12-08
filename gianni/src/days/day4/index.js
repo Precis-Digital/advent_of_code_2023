@@ -28,7 +28,7 @@ import('./class.js').then((module) => {
   ============================================================================= */
 
   // The day and results are logged to the console.
-  log.message(`\n${'🎄'.repeat(DayNumber)} ⭐⭐ ⭐⭐ ❌❌ ⭐⭐\n`);
+  log.message(`\n${'🎄'.repeat(DayNumber)} ⭐⭐ ⭐⭐ ⭐⭐ ⭐⭐\n`);
   log.results(day, classSize, dataSize, solution);
 
   // Present box separator
