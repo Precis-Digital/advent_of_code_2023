@@ -1,7 +1,7 @@
 package day07
 
 import (
-	_ "embed"
+	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"sort"
