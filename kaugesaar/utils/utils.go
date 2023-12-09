@@ -50,3 +50,18 @@ func ReverseIntArray(arr []int) []int {
 	}
 	return reversed
 }
+
+func LCM(a, b int, ints ...int) int {
+	result := a * b / GCD(a, b)
+	for _, i := range ints {
+		result = LCM(result, i)
+	}
+	return result
+}
+
+func GCD(a, b int) int {
+	if a == 0 {
+		return b
+	}
+	return GCD(b%a, a)
+}
