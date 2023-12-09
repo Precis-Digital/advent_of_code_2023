@@ -1,7 +1,6 @@
 package day05
 
 import (
-	"fmt"
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"strings"
@@ -69,7 +68,6 @@ func parser() Almanac {
 		if unicode.IsDigit(rune(row[0])) {
 			nums := strings.Fields(row)
 			if len(nums) > 2 {
-				fmt.Println(nums)
 				levels = append(levels, Level{
 					Source:      utils.ToInt(nums[1]),
 					Destination: utils.ToInt(nums[0]),
