@@ -30,7 +30,7 @@ func parser() [][]int {
 	return histories
 }
 
-func predict(history []int) int {
+func nextValue(history []int) int {
 	if utils.SumArr(history) == 0 {
 		return 0
 	}
@@ -42,17 +42,17 @@ func predict(history []int) int {
 		differences[i-1] = difference
 	}
 
-	return history[len(history)-1] + predict(differences)
+	return history[len(history)-1] + nextValue(differences)
 }
 
-func calcluateDistance(histories [][]int, isPartTwo bool) int {
+func calculateDistance(histories [][]int, isPartTwo bool) int {
 	sum := 0
 
 	for _, history := range histories {
 		if isPartTwo {
 			history = utils.ReverseIntArray(history)
 		}
-		sum += predict(history)
+		sum += nextValue(history)
 	}
 
 	return sum
@@ -61,7 +61,7 @@ func calcluateDistance(histories [][]int, isPartTwo bool) int {
 func p1() string {
 	histories := parser()
 
-	sum := calcluateDistance(histories, false)
+	sum := calculateDistance(histories, false)
 
 	return utils.ToStr(sum)
 }
@@ -69,7 +69,7 @@ func p1() string {
 func p2() string {
 	histories := parser()
 
-	sum := calcluateDistance(histories, true)
+	sum := calculateDistance(histories, true)
 
 	return utils.ToStr(sum)
 }
