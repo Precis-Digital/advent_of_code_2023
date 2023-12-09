@@ -1,7 +1,6 @@
 package day08
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"regexp"
@@ -11,13 +10,10 @@ import (
 // Solver for day 8 and its both parts
 type Solver struct{}
 
-//go:embed day8.txt
-var fileInput string
-
 type Network map[string][2]string
 
 func parser() ([]int, Network) {
-	rows := strings.Split(fileInput, "\n")
+	rows := utils.ReadFile("day8.txt")
 	nodeRe := regexp.MustCompile(`[A-Z]{3,3}`)
 
 	var directions []int

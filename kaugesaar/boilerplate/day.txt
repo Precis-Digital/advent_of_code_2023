@@ -1,7 +1,6 @@
 package day{DISPLAY_DAY}
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 )
@@ -9,8 +8,9 @@ import (
 // Solver for day {DAY} and its both parts
 type Solver struct{}
 
-//go:embed day{DAY}.txt
-var fileInput string
+func parser() {
+	rows := utils.ReadFile("day{DAY}.txt")
+}
 
 func p1() string {
 	return utils.ToStr(1)

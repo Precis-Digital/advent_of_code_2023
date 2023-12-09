@@ -1,21 +1,17 @@
 package day01
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"strings"
 	"unicode"
 )
 
-//go:embed day1.txt
-var fileInput string
-
 // Solver for day 1 and its both parts
 type Solver struct{}
 
 func parser(part int) string {
-	rows := strings.Split(fileInput, "\n")
+	rows := utils.ReadFile("day1.txt")
 	var numbers []int
 
 	findFirst := func(s string) string {

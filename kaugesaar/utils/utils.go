@@ -1,6 +1,21 @@
 package utils
 
-import "strconv"
+import (
+	"bufio"
+	"os"
+	"strconv"
+)
+
+func ReadFile(filename string) []string {
+	rows := []string{}
+	file, _ := os.Open(filename)
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		rows = append(rows, scanner.Text())
+	}
+	return rows
+}
 
 func ToInt(s string) int {
 	i, _ := strconv.Atoi(s)

@@ -1,21 +1,16 @@
 package day09
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"regexp"
-	"strings"
 )
 
 // Solver for day 9 and its both parts
 type Solver struct{}
 
-//go:embed day9.txt
-var fileInput string
-
 func parser() [][]int {
-	rows := strings.Split(fileInput, "\n")
+	rows := utils.ReadFile("day9.txt")
 	histories := make([][]int, len(rows))
 	digitRe := regexp.MustCompile(`-\d+|\d+`)
 
