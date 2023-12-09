@@ -42,3 +42,11 @@ func MinArr(arr []int) int {
 	}
 	return min
 }
+
+func ReverseIntArray(arr []int) []int {
+	reversed := make([]int, len(arr))
+	for i, value := range arr {
+		reversed[len(arr)-1-i] = value
+	}
+	return reversed
+}
