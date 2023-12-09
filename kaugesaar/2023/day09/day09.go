@@ -30,34 +30,29 @@ func parser() [][]int {
 	return histories
 }
 
+func predict(history []int) int {
+	if utils.SumArr(history) == 0 {
+		return 0
+	}
+
+	differences := make([]int, len(history)-1)
+
+	for i := 1; i < len(history); i++ {
+		difference := history[i] - history[i-1]
+		differences[i-1] = difference
+	}
+
+	return history[len(history)-1] + predict(differences)
+}
+
 func calcluateDistance(histories [][]int, isPartTwo bool) int {
 	sum := 0
 
 	for _, history := range histories {
-		var distances [][]int
-
 		if isPartTwo {
 			history = utils.ReverseIntArray(history)
 		}
-
-		for len(history) > 1 {
-			distances = append(distances, history)
-
-			nextRow := make([]int, len(history)-1)
-			for i := 0; i < len(nextRow); i++ {
-				nextRow[i] = history[i+1] - history[i]
-			}
-
-			history = nextRow
-		}
-
-		distances = append(distances, history)
-
-		for i := len(distances) - 2; i >= 0; i-- {
-			distances[i] = append(distances[i], distances[i+1][len(distances[i+1])-1]+distances[i][len(distances[i])-1])
-		}
-
-		sum += distances[0][len(distances[0])-1]
+		sum += predict(history)
 	}
 
 	return sum
