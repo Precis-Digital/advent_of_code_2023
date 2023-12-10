@@ -3,124 +3,126 @@ package day10
 import (
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
+	"strings"
 )
-
-/**
-	"╔": "╔",
-	"╗": "╗",
-	"╚": "╚",
-	"╝": "╝",
-	"═": "═",
-	"║": "║",
-**/
 
 // Solver for day 10 and its both parts
 type Solver struct{}
 
-type Pipe struct {
-	North bool
-	East  bool
-	South bool
-	West  bool
-}
-
-type Pos struct {
-	X int
-	Y int
-}
-
-var tilesMap = map[rune]Pipe{
-	'|': {true, false, true, false},
-	'-': {false, true, false, true},
-	'L': {true, true, false, false},
-	'J': {true, false, false, true},
-	'7': {false, false, true, true},
-	'F': {false, true, true, false},
-	'.': {false, false, false, false},
-	'S': {true, true, true, true},
-}
-
-func parser() (Pos, map[Pos]Pipe) {
+func parser() ([][][4]bool, [2]int) {
 	rows := utils.ReadFile("day10.txt")
+	var start [2]int
+	graph := make([][][4]bool, len(rows))
+	for r, row := range rows {
+		graph[r] = make([][4]bool, len(row))
+		for c, tile := range strings.Split(row, "") {
+			if tile == "S" {
+				start[0], start[1] = r, c
+			}
+			graph[r][c] = getConnection(tile)
+		}
+	}
+	return graph, start
+}
 
-	pipes := map[Pos]Pipe{}
+func getConnection(tile string) [4]bool {
+	switch tile {
+	case "|":
+		return [4]bool{true, false, true, false}
+	case "-":
+		return [4]bool{false, true, false, true}
+	case "L":
+		return [4]bool{true, true, false, false}
+	case "J":
+		return [4]bool{true, false, false, true}
+	case "7":
+		return [4]bool{false, false, true, true}
+	case "F":
+		return [4]bool{false, true, true, false}
+	default:
+		return [4]bool{false, false, false, false}
+	}
+}
 
-	startPos := Pos{0, 0}
-
-	for y, row := range rows {
-		for x, char := range row {
-			pipes[Pos{x, y}] = tilesMap[char]
-			if char == 'S' {
-				startPos = Pos{x, y}
+func findLoop(graph [][][4]bool, start [2]int) (map[[2]int]bool, bool) {
+	row, col := start[0], start[1]
+	var dir int
+	for idx, val := range graph[row][col] {
+		if val {
+			dir = idx
+			break
+		}
+	}
+	visited := make(map[[2]int]bool)
+	for {
+		if _, exsists := visited[[2]int{row, col}]; exsists {
+			return visited, true
+		}
+		visited[[2]int{row, col}] = true
+		cameFrom := 0
+		switch dir {
+		case 0:
+			row--
+			cameFrom = 2
+		case 1:
+			col++
+			cameFrom = 3
+		case 2:
+			row++
+			cameFrom = 0
+		case 3:
+			col--
+			cameFrom = 1
+		default:
+			panic("Invalid direction")
+		}
+		if !graph[row][col][cameFrom] {
+			return nil, false
+		}
+		for i := 0; i < 4; i++ {
+			if i != cameFrom && graph[row][col][i] {
+				dir = i
+				break
 			}
 		}
 	}
-
-	return startPos, pipes
 }
 
-func findFurthestPosition(startPos Pos, pipes map[Pos]Pipe) int {
-	visited := make(map[Pos]bool)
-	queue := []Pos{startPos}
-	distances := make(map[Pos]int)
-	distances[startPos] = 0
-	maxDistance := 0
-
-	for len(queue) > 0 {
-		currentPos := queue[0]
-		queue = queue[1:]
-
-		if distances[currentPos] > maxDistance {
-			maxDistance = distances[currentPos]
-		}
-
-		for _, direction := range []struct{ dx, dy int }{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
-			neighbor := Pos{currentPos.X + direction.dx, currentPos.Y + direction.dy}
-			if canMove(currentPos, neighbor, pipes) && !visited[neighbor] {
-				queue = append(queue, neighbor)
-				visited[neighbor] = true
-				distances[neighbor] = distances[currentPos] + 1
-			}
+func findFullLoop(graph [][][4]bool, start [2]int) map[[2]int]bool {
+	fullLoop := make(map[[2]int]bool)
+	for _, startTile := range []string{"J", "|", "-", "L", "7", "F"} {
+		graph[start[0]][start[1]] = getConnection(startTile)
+		if loop, found := findLoop(graph, start); found {
+			fullLoop = loop
+			break
 		}
 	}
-
-	return maxDistance
-}
-
-func canMove(from, to Pos, pipes map[Pos]Pipe) bool {
-	dx := to.X - from.X
-	dy := to.Y - from.Y
-
-	fromPipe := pipes[from]
-	toPipe := pipes[to]
-
-	if dy == -1 {
-		return fromPipe.North && toPipe.South
-	}
-
-	if dy == 1 {
-		return fromPipe.South && toPipe.North
-	}
-
-	if dx == 1 {
-		return fromPipe.East && toPipe.West
-	}
-
-	if dx == -1 {
-		return fromPipe.West && toPipe.East
-	}
-
-	return false
+	return fullLoop
 }
 
 func p1() string {
-	startPos, pipes := parser()
-	distance := findFurthestPosition(startPos, pipes)
-	return utils.ToStr(distance)
+	graph, start := parser()
+	loop := findFullLoop(graph, start)
+	return utils.ToStr(len(loop) / 2)
 }
 
 func p2() string {
-	return utils.ToStr(2)
+	graph, start := parser()
+	loop := findFullLoop(graph, start)
+	sum := 0
+	for r := range graph {
+		inside := false
+		for c := range graph[r] {
+			if !loop[[2]int{r, c}] {
+				if inside {
+					sum++
+				}
+			} else if graph[r][c][0] {
+				inside = !inside
+			}
+		}
+	}
+	return utils.ToStr(sum)
 }
 
 // Part1 the solution for part 1, day 10
