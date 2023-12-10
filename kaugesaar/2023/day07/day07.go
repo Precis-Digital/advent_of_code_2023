@@ -1,7 +1,6 @@
 package day07
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"sort"
@@ -20,9 +19,6 @@ const (
 
 // Solver for day 7 and its both parts
 type Solver struct{}
-
-//go:embed day7.txt
-var fileInput string
 
 func cardIndex(c rune, isPartTwo bool) int {
 	switch c {
@@ -118,7 +114,7 @@ func handStrength(cards string, isPartTwo bool) (int, int) {
 }
 
 func parser(isPartTwo bool) [][]int {
-	rows := strings.Split(fileInput, "\n")
+	rows := utils.ReadFile("day7.txt")
 	hands := make([][]int, 0)
 	for _, row := range rows {
 		if row == "" {

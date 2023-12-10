@@ -1,14 +1,11 @@
 package day05
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"strings"
+	"unicode"
 )
-
-//go:embed day5.txt
-var fileInput string
 
 // Solver for day 5 and its both parts
 type Solver struct{}
@@ -33,10 +30,9 @@ type Almanac struct {
 func parser() Almanac {
 	var a Almanac
 
-	fileInput = strings.ReplaceAll(fileInput, "\n\r", "\n\n")
-	parts := strings.SplitN(fileInput, "\n\n", 2)
+	rows := utils.ReadFile("day5.txt")
 
-	seeds := strings.Fields(parts[0])[1:]
+	seeds := strings.Fields(rows[0])[1:]
 
 	for _, seed := range seeds {
 		a.Seeds = append(a.Seeds, utils.ToInt(seed))
@@ -49,9 +45,27 @@ func parser() Almanac {
 		})
 	}
 
-	for _, level := range strings.Split(parts[1], "\n\n") {
-		var levels []Level
-		for _, row := range strings.SplitN(level, "\n", -1)[1:] {
+	var levels []Level
+
+	isNewMap := true
+
+	for i, row := range rows[3:] {
+
+		if len(row) == 0 {
+			continue
+		}
+
+		if isNewMap {
+			levels = make([]Level, 0)
+			isNewMap = false
+		}
+
+		if unicode.IsLetter(rune(row[0])) || i == len(rows)-4 {
+			a.Levels = append(a.Levels, levels)
+			isNewMap = true
+		}
+
+		if unicode.IsDigit(rune(row[0])) {
 			nums := strings.Fields(row)
 			if len(nums) > 2 {
 				levels = append(levels, Level{
@@ -61,7 +75,6 @@ func parser() Almanac {
 				})
 			}
 		}
-		a.Levels = append(a.Levels, levels)
 	}
 
 	return a

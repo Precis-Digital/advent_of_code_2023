@@ -1,6 +1,36 @@
 package utils
 
-import "strconv"
+import (
+	"bufio"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+)
+
+func ReadFile(filename string) []string {
+	rows := []string{}
+
+	wd, _ := os.Getwd()
+	isTestRun := ""
+
+	if strings.Contains(wd, "day") {
+		isTestRun = "../../"
+	}
+
+	file, err := os.Open(filepath.Join(wd, isTestRun, "./inputs", filename))
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		rows = append(rows, scanner.Text())
+	}
+
+	return rows
+}
 
 func ToInt(s string) int {
 	i, _ := strconv.Atoi(s)
@@ -41,4 +71,27 @@ func MinArr(arr []int) int {
 		}
 	}
 	return min
+}
+
+func ReverseIntArray(arr []int) []int {
+	reversed := make([]int, len(arr))
+	for i, value := range arr {
+		reversed[len(arr)-1-i] = value
+	}
+	return reversed
+}
+
+func LCM(a, b int, ints ...int) int {
+	result := a * b / GCD(a, b)
+	for _, i := range ints {
+		result = LCM(result, i)
+	}
+	return result
+}
+
+func GCD(a, b int) int {
+	if a == 0 {
+		return b
+	}
+	return GCD(b%a, a)
 }

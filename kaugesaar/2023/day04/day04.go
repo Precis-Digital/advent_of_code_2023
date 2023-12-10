@@ -1,7 +1,6 @@
 package day04
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"math"
@@ -9,9 +8,6 @@ import (
 	"slices"
 	"strings"
 )
-
-//go:embed day4.txt
-var fileInput string
 
 // Solver for day 4 and its both parts
 type Solver struct{}
@@ -21,9 +17,10 @@ type Card struct {
 	WinningNumbers []int
 }
 
+var digitRe = regexp.MustCompile(`\d+`)
+
 func parser() []Card {
-	doubleSpaces := regexp.MustCompile(`\s{2,}`)
-	rows := strings.Split(doubleSpaces.ReplaceAllString(fileInput, " "), "\n")
+	rows := utils.ReadFile("day4.txt")
 
 	cards := make([]Card, len(rows))
 
@@ -41,7 +38,7 @@ func parser() []Card {
 }
 
 func parseNumbers(input string) []int {
-	numStrs := strings.Split(input, " ")
+	numStrs := digitRe.FindAllString(input, -1)
 	nums := make([]int, len(numStrs))
 
 	for i, numStr := range numStrs {

@@ -1,16 +1,11 @@
 package day03
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"regexp"
-	"strings"
 	"unicode"
 )
-
-//go:embed day3.txt
-var fileInput string
 
 // Solver for day 3 and its both parts
 type Solver struct{}
@@ -22,7 +17,7 @@ type Point struct {
 
 func parser() map[Point][]int {
 	directions := []Point{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}
-	rows := strings.Split(fileInput, "\n")
+	rows := utils.ReadFile("day3.txt")
 	digitRe := regexp.MustCompile(`\d+`)
 
 	symbolMap := map[Point]rune{}

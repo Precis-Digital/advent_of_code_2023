@@ -1,7 +1,6 @@
 package day08
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"regexp"
@@ -11,134 +10,76 @@ import (
 // Solver for day 8 and its both parts
 type Solver struct{}
 
-//go:embed day8.txt
-var fileInput string
+type Network map[string][2]string
 
-type Cycle struct {
-	offset int
-	length int
-	steps  int
-}
-
-func parser() (instructions []int, nodes map[string][]string) {
-	rows := strings.Split(fileInput, "\n")
+func parser() ([]int, Network) {
+	rows := utils.ReadFile("day8.txt")
 	nodeRe := regexp.MustCompile(`[A-Z]{3,3}`)
 
-	for _, instruction := range strings.Split(rows[0], "") {
-		if instruction == "R" {
-			instructions = append(instructions, 2)
-		} else {
-			instructions = append(instructions, 1)
+	var directions []int
+
+	for _, dir := range rows[0] {
+		if dir == 'R' {
+			directions = append(directions, 1)
+		}
+		if dir == 'L' {
+			directions = append(directions, 0)
 		}
 	}
 
 	rows = rows[2:]
-	nodes = make(map[string][]string, len(rows))
+	nodes := make(Network, len(rows))
 
 	for _, row := range rows {
 		parts := strings.SplitN(row, " = ", 2)
 		n := nodeRe.FindAllString(parts[1], -1)
-		nodes[parts[0]] = []string{parts[0], n[0], n[1]}
+		nodes[parts[0]] = [2]string{n[0], n[1]}
 	}
 
-	return instructions, nodes
+	return directions, nodes
 }
 
-func findCycle(nodes map[string][]string, instructions []int, currentNode string) (offset, cycle int) {
-	found := false
+func findTotalSteps(network Network, directions []int, startNode, endNode string) int {
+	currentNode := startNode
+	steps := 0
 	for {
-		for _, instruction := range instructions {
-			currentNode = nodes[currentNode][instruction]
-
-			if found && currentNode[2] == 'Z' {
-				return offset, cycle
-			}
-
-			if currentNode[2] == 'Z' {
-				found = true
-			}
-
-			if found {
-				cycle++
-			} else {
-				offset++
+		for _, dir := range directions {
+			currentNode = network[currentNode][dir]
+			steps++
+			if strings.HasSuffix(currentNode, endNode) {
+				return steps
 			}
 		}
 	}
+
 }
 
 func p1() string {
-	instructions, nodes := parser()
+	directions, network := parser()
 
-	steps := 0
-	found := false
-
-	currentNode := "AAA"
-
-	for !found {
-		for _, instruction := range instructions {
-			currentNode = nodes[currentNode][instruction]
-			steps++
-			if currentNode == "ZZZ" {
-				found = true
-				break
-			}
-		}
-	}
+	steps := findTotalSteps(network, directions, "AAA", "ZZZ")
 
 	return utils.ToStr(steps)
 }
 
 func p2() string {
-	instructions, nodes := parser()
+	directions, network := parser()
 
-	currentNodes := []string{}
-
-	for key := range nodes {
-		if key[2] == 'A' {
-			currentNodes = append(currentNodes, key)
+	var positions []string
+	for position := range network {
+		if strings.HasSuffix(position, "A") {
+			positions = append(positions, position)
 		}
 	}
 
-	cycles := make([]Cycle, 0)
-
-	for _, currentNode := range currentNodes {
-		offset, length := findCycle(nodes, instructions, currentNode)
-		cycles = append(cycles, Cycle{offset, length, offset})
+	var steps []int
+	for _, position := range positions {
+		steps = append(steps, findTotalSteps(network, directions, position, "Z"))
 	}
 
-	for {
-		steps := 0
-		for i := range cycles {
-			if cycles[i].steps > steps {
-				steps = cycles[i].steps
-			}
-		}
+	sum := utils.LCM(steps[0], steps[1], steps[2:]...)
 
-		for i := range cycles {
-			for cycles[i].steps < steps {
-				cycles[i].steps += cycles[i].length
-			}
-		}
-
-		allEqual := true
-		for i := range cycles[1:] {
-			if cycles[i].steps != cycles[i+1].steps {
-				allEqual = false
-				break
-			}
-		}
-
-		if allEqual {
-			break
-		} else {
-			for i := range cycles {
-				cycles[i].steps += cycles[i].length
-			}
-		}
-	}
-
-	return utils.ToStr(cycles[0].steps + 1)
+	return utils.ToStr(sum)
 }
 
 // Part1 the solution for part 1, day 8
