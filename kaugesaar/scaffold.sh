@@ -41,4 +41,4 @@ mv boilerplate/day${DAY}_test.txt ${TARGET}/day${DISPLAY_DAY}_test.go
 INPUT_URL="https://adventofcode.com/2023/day/${DAY}/input"
 TEMP_INPUT="temp-input.txt"
 curl "${INPUT_URL}" -H "cookie: session=$AOC_SESSION_COOKIE" -o "${TEMP_INPUT}" 2>/dev/null
-mv ${TEMP_INPUT} ${TARGET}/day${DAY}.txt 
+mv ${TEMP_INPUT} inputs/day${DAY}.txt 

@@ -3,17 +3,32 @@ package utils
 import (
 	"bufio"
 	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 func ReadFile(filename string) []string {
 	rows := []string{}
-	file, _ := os.Open(filename)
+
+	wd, _ := os.Getwd()
+	isTestRun := ""
+
+	if strings.Contains(wd, "day") {
+		isTestRun = "../../"
+	}
+
+	file, err := os.Open(filepath.Join(wd, isTestRun, "./inputs", filename))
+	if err != nil {
+		panic(err)
+	}
+
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		rows = append(rows, scanner.Text())
 	}
+
 	return rows
 }
 
