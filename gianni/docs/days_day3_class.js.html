@@ -1,4 +1,91 @@
-import chalk from 'chalk';
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> days/day3/class.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="dont-remove/style.css">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="ChallengeLauncher.html">ChallengeLauncher</a></li><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day3.html">Day3</a></li><li><a href="Day4.html">Day4</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>days/day3/class.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import chalk from 'chalk';
 
 /**
  * @class
@@ -94,12 +181,12 @@ export class Day3 {
     const isEdgeLeft = number[1] % this.lineLength === 0;
     const isEdgeRight = (number[1] + number[2] + 1) % this.lineLength === 0;
     const positionsToCheck = [
-      ...this.generateNumberRange(number[1] - (!isEdgeLeft && 1) - this.lineLength, number[1] + number[2] - this.lineLength + (!isEdgeRight && 1)),
-      !isEdgeLeft && number[1] - 1,
-      !isEdgeRight && number[1] + number[2],
-      ...this.generateNumberRange(number[1] - (!isEdgeLeft && 1) + this.lineLength, number[1] + number[2] + this.lineLength + (!isEdgeRight && 1)),
+      ...this.generateNumberRange(number[1] - (!isEdgeLeft &amp;&amp; 1) - this.lineLength, number[1] + number[2] - this.lineLength + (!isEdgeRight &amp;&amp; 1)),
+      !isEdgeLeft &amp;&amp; number[1] - 1,
+      !isEdgeRight &amp;&amp; number[1] + number[2],
+      ...this.generateNumberRange(number[1] - (!isEdgeLeft &amp;&amp; 1) + this.lineLength, number[1] + number[2] + this.lineLength + (!isEdgeRight &amp;&amp; 1)),
     ];
-    return positionsToCheck.filter(position => position >= 0 && position < this.dataLines.length);
+    return positionsToCheck.filter(position => position >= 0 &amp;&amp; position &lt; this.dataLines.length);
   }
 
   // Part 1 related methods
@@ -273,7 +360,7 @@ export class Day3 {
     const highlightSymbols = (line) => {
       this.symbolPositions.forEach((position) => {
         const symbol = this.dataLines[position];
-        const escapedSymbol = symbol.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const escapedSymbol = symbol.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&amp;');
         const regex = new RegExp(`${escapedSymbol}`, 'g');
         line = line.replaceAll(regex, chalk.cyanBright(symbol));
       });
@@ -317,3 +404,23 @@ export class Day3 {
     return formattedInput;
   }
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+
+</body>
+</html>

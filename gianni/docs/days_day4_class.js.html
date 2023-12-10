@@ -68,7 +68,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day4.html">Day4</a></li></ul><h3>Global</h3><ul><li><a href="global.html#replaceLastOccurrence">replaceLastOccurrence</a></li><li><a href="global.html#splitLine">splitLine</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="ChallengeLauncher.html">ChallengeLauncher</a></li><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day3.html">Day3</a></li><li><a href="Day4.html">Day4</a></li></ul></div>
                 
             </nav>
         </div>
@@ -108,6 +108,13 @@ export class Day4 {
    * @constructor
    * @param {Array&lt;string>} dataLines - The data lines to process.
    * @param {boolean} isLoggingEnabled - Whether logging is enabled.
+   * @example
+   * const dataLines = [
+   *   "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
+   * ];
+   * const isLoggingEnabled = true;
+   * const day4 = new Day4(dataLines, isLoggingEnabled);
+   * console.log(day4); // logs the new instance of the Day4 class
    */
   constructor(dataLines, isLoggingEnabled) {
     this.dataLines = dataLines;

@@ -68,7 +68,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day4.html">Day4</a></li></ul><h3>Global</h3><ul><li><a href="global.html#replaceLastOccurrence">replaceLastOccurrence</a></li><li><a href="global.html#splitLine">splitLine</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="ChallengeLauncher.html">ChallengeLauncher</a></li><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day3.html">Day3</a></li><li><a href="Day4.html">Day4</a></li></ul></div>
                 
             </nav>
         </div>
@@ -120,6 +120,7 @@ export class Day1 {
   constructor(dataLines, isLoggingEnabled) {
     this.dataLines = dataLines;
     this.isLoggingEnabled = isLoggingEnabled;
+    this.time = {};
     this.maxLineLength = Math.max(...this.dataLines.map(line => line.length));
     this.numericWords = [
       { word: 'one', number: 1 },
@@ -208,6 +209,12 @@ export class Day1 {
     const finalWord = this.findNumeric(line, numbersOnly, 'backward');
     const number = parseInt(`${initialWord.number}${finalWord.number}`, 10);
 
+    if (numbersOnly === 'numberOnly') {
+      this.totalSum.part1 += number;
+    } else {
+      this.totalSum.part2 += number;
+    }
+
     if (this.isLoggingEnabled) {
       const initialWordValue = initialWord.type === 'word' ? initialWord.word : initialWord.number;
       const finalWordValue = finalWord.type === 'word' ? finalWord.word : finalWord.number;
@@ -215,10 +222,8 @@ export class Day1 {
       line = line.padEnd(this.maxLineLength, ' ');
       line = line.replace(initialWordValue, `${chalk.redBright(initialWordValue)}`);
       line = chalk.grey(replace.lastOccurrence(line, finalWordValue, `${chalk.cyanBright(finalWordValue)}`));
-      console.log(line, chalk.blue('points:'), number);
+      console.log(line, chalk.blue('points:'), number, chalk.blue('total:'), numbersOnly === 'numberOnly' ? this.totalSum.part1 : this.totalSum.part2);
     }
-
-    return number;
   }
 
   /**
@@ -232,11 +237,8 @@ export class Day1 {
    */
   part1() {
     process.lines(this.dataLines, (line) => {
-      this.totalSum.part1 += this.processLine(line, 'numberOnly');
+      this.processLine(line, 'numberOnly');
     });
-    if (this.isLoggingEnabled) {
-      console.log('');
-    }
   }
 
   /**
@@ -250,11 +252,8 @@ export class Day1 {
    */
   part2() {
     process.lines(this.dataLines, (line) => {
-      this.totalSum.part2 += this.processLine(line, 'all');
+      this.processLine(line, 'all');
     });
-    if (this.isLoggingEnabled) {
-      console.log('');
-    }
   }
 }
 </code></pre>

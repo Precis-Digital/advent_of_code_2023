@@ -66,7 +66,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day4.html">Day4</a></li></ul><h3>Global</h3><ul><li><a href="global.html#replaceLastOccurrence">replaceLastOccurrence</a></li><li><a href="global.html#splitLine">splitLine</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="ChallengeLauncher.html">ChallengeLauncher</a></li><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day3.html">Day3</a></li><li><a href="Day4.html">Day4</a></li></ul></div>
                 
             </nav>
         </div>
@@ -133,7 +133,7 @@
         <p class="tag-source">
             <a href="utils_utils.js.html" class="button">View Source</a>
             <span>
-                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line7">line 7</a>
+                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line8">line 8</a>
             </span>
         </p>
     
@@ -287,7 +287,7 @@
         <p class="tag-source">
             <a href="utils_utils.js.html" class="button">View Source</a>
             <span>
-                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line45">line 45</a>
+                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line48">line 48</a>
             </span>
         </p>
     
@@ -517,7 +517,7 @@ console.log(`File size: ${size} KB`);</code></pre>
         <p class="tag-source">
             <a href="utils_utils.js.html" class="button">View Source</a>
             <span>
-                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line65">line 65</a>
+                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line68">line 68</a>
             </span>
         </p>
     
@@ -702,7 +702,7 @@ console.log(`Execution time: ${time} ms`);</code></pre>
         <p class="tag-source">
             <a href="utils_utils.js.html" class="button">View Source</a>
             <span>
-                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line25">line 25</a>
+                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line26">line 26</a>
             </span>
         </p>
     
@@ -758,6 +758,426 @@ console.log(`Execution time: ${time} ms`);</code></pre>
     
         <pre class="prettyprint"><code>const lines = loadTextFile('./path/to/file.txt');
 console.log(lines);</code></pre>
+    
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id=".replaceLastOccurrence">
+        <a class="href-link" href="#.replaceLastOccurrence">#</a>
+        
+            
+                <span class='tag'>static</span>
+            
+        
+        <span class="code-name">
+            
+                replaceLastOccurrence<span class="signature">(sourceString, substringToReplace, replace)</span><span class="type-signature"> &rarr; {string}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        This function replaces the last occurrence of a substring in a source string with a new string.
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>sourceString</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">string</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last">The original string. For example, 'Hello, world!'.</td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>substringToReplace</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">string</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last">The substring to be replaced. For example, 'world'.</td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>replace</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">string</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last">The string to replace the substring with. For example, 'GitHub Copilot'.</td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="utils_utils.js.html" class="button">View Source</a>
+            <span>
+                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line111">line 111</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'>The source string with the last occurrence of the substring replaced. For example, 'Hello, GitHub Copilot!'.</div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<code class="param-type">string</code>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+    <h5>Example</h5>
+    
+    
+        <pre class="prettyprint"><code>replaceLastOccurrence('Hello, world!', 'world', 'GitHub Copilot'); // returns 'Hello, GitHub Copilot!'</code></pre>
+    
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id=".splitLine">
+        <a class="href-link" href="#.splitLine">#</a>
+        
+            
+                <span class='tag'>static</span>
+            
+        
+        <span class="code-name">
+            
+                splitLine<span class="signature">(card)</span><span class="type-signature"> &rarr; {Array.&lt;string>}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        Splits a card string into two parts based on the pattern ': '
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>card</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">string</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last">The card string to split.</td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="utils_utils.js.html" class="button">View Source</a>
+            <span>
+                <a href="utils_utils.js.html">utils/utils.js</a>, <a href="utils_utils.js.html#line170">line 170</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'>The split card string.</div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<code class="param-type">Array.&lt;string></code>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+    <h5>Example</h5>
+    
+    
+        <pre class="prettyprint"><code>const card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53";
+const splitCard = splitCard(card);
+console.log(splitCard); // ["Card 1", "41 48 83 86 17 | 83 86  6 31 17  9 48 53"]</code></pre>
     
 
 

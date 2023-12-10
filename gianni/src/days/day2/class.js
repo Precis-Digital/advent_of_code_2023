@@ -30,6 +30,7 @@ export class Day2 {
   constructor(dataLines, isLoggingEnabled) {
     this.dataLines = dataLines;
     this.isLoggingEnabled = isLoggingEnabled;
+    this.time = {};
     this.maxLineLength = Math.max(...this.dataLines.map(line => line.length));
     this.availableCubes = { red: 12, green: 13, blue: 14 };
     this.totalSum = {

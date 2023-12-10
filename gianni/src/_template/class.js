@@ -1,5 +1,5 @@
 // import chalk from 'chalk';
-import { process } from '../../utils/utils.js';
+import { process } from '../utils/utils.js';
 
 /**
  * @class
@@ -23,6 +23,7 @@ export class Day2 {
   constructor(dataLines, isLoggingEnabled) {
     this.dataLines = dataLines;
     this.isLoggingEnabled = isLoggingEnabled;
+    this.time = {};
     this.totalSum = {
       part1: 0,
       part2: 0,

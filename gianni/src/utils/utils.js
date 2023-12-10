@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import { performance } from 'perf_hooks';
 import chalk from 'chalk';
 import logMessage from './logMessage.js';
+import descriptions from '../days/descriptions.js';
 
 /**
  * @namespace Utils
@@ -22,9 +23,11 @@ import logMessage from './logMessage.js';
  * @param {string} filePath - The path to the file.
  * @returns {string[]} An array of lines from the file.
  */
-const getTextFile = (filePath) => {
+const getTextFile = (filePath, dontSplit) => {
   // Read the file synchronously and return its contents
   const data = fs.readFileSync(filePath, 'utf8');
+  if (dontSplit) return data;
+
   // Split the data into lines
   const lines = data.split('\n');
   return lines;
@@ -64,7 +67,7 @@ const getFileSize = (filePath) => {
  */
 const getRuntime = (func) => {
   const t0 = performance.now();
-  const result = func();
+  func();
   const t1 = performance.now();
   let time = t1 - t0; // time in milliseconds
   let unit = 'ms';
@@ -83,9 +86,9 @@ const getRuntime = (func) => {
   return `${time.toFixed(2)} ${unit}`;
 };
 
-const getDataAndSize = (file, day) => {
+const getDataAndSize = (file, day, dontSplit) => {
   const filePath = `./src/days/${day}/${file}`;
-  const data = getTextFile(filePath);
+  const data = getTextFile(filePath, dontSplit);
   const size = getFileSize(filePath);
   return { data, size };
 };
@@ -94,6 +97,8 @@ const getDataAndSize = (file, day) => {
 
 /**
    * This function replaces the last occurrence of a substring in a source string with a new string.
+   *
+   * @memberof Utils
    *
    * @param {string} sourceString - The original string. For example, 'Hello, world!'.
    * @param {string} substringToReplace - The substring to be replaced. For example, 'world'.
@@ -141,6 +146,7 @@ const logResults = (day, classSize, dataSize, solution) => {
 const logExecute = (DayClass, partNumber, lines) => {
   console.log(`Part ${partNumber}\n`);
   const solution = new DayClass(lines, true);
+  console.log(chalk.green('Solution:'), descriptions[solution.constructor.name.toLowerCase()][`part${partNumber}`], '\n');
   const runtime = getRuntime(() => solution[`part${partNumber}`]());
   console.log(`\n${chalk.blue('Result:')} ${chalk.green(solution.totalSum[`part${partNumber}`])}`);
   console.log(`${chalk.blue('Runtime:')} ${chalk.green(`${runtime}`)}\n`);
@@ -151,6 +157,9 @@ const logExecute = (DayClass, partNumber, lines) => {
 
 /**
    * Splits a card string into two parts based on the pattern ': '
+   *
+   * @memberof Utils
+   *
    * @param {string} card - The card string to split.
    * @returns {Array<string>} The split card string.
    * @example

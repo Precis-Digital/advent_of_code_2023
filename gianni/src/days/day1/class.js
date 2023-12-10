@@ -33,6 +33,7 @@ export class Day1 {
   constructor(dataLines, isLoggingEnabled) {
     this.dataLines = dataLines;
     this.isLoggingEnabled = isLoggingEnabled;
+    this.time = {};
     this.maxLineLength = Math.max(...this.dataLines.map(line => line.length));
     this.numericWords = [
       { word: 'one', number: 1 },
@@ -151,9 +152,6 @@ export class Day1 {
     process.lines(this.dataLines, (line) => {
       this.processLine(line, 'numberOnly');
     });
-    if (this.isLoggingEnabled) {
-      console.log('');
-    }
   }
 
   /**
@@ -169,8 +167,5 @@ export class Day1 {
     process.lines(this.dataLines, (line) => {
       this.processLine(line, 'all');
     });
-    if (this.isLoggingEnabled) {
-      console.log('');
-    }
   }
 }

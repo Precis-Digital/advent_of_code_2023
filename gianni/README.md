@@ -16,12 +16,12 @@ This project is a collaborative effort between the developer and GitHub Copilot
 - **Progress:** Aim to surpass previous year's AOC progress.
 
 ## Commands
-- `npm install` Install dependencies
-- `npm run -s start` Run all days
-- `npm run -s start:day -- 1` Run specific day 
-- `npm run -s start:min` Run all days from minified code
-- `npm run -s start:min:day -- 1` Run specific day from minified code
-- `npm run docs` Create documentation of functions that have JSdoc comments
+- `npm install` Install dependencies.
+- `npm run start` Run all days. 
+- `npm run start -- day=1` Run a specific day.
+- `npm run start -- minify=true` Run minified.
+- `npm run start -- day=1 minify=true` Combine the arguments like this.
+- `npm run docs` Create documentation of functions that have JSdoc comments.
 
 ## Updates
 
@@ -78,17 +78,23 @@ This project is a collaborative effort between the developer and GitHub Copilot
 
 - Turned Day 3 into a class
 - added extra logging to day 3
-
 - WINTER PARTY!!!
-
 
 #### Day 9
 
+- Day 3 clean up and added comments
+- Added story and the problem/solution in comments (not sure if i should color it)
+- turned index.js now launcher.js into a class
+
+#### Day 10
+
+- Made the launcher.js class work for the exceptions
+- Made an index.js for the cli commands instead of having it all in the package.json that became unreadable and to call the launcher class
+- Added colors to descriptions
+- Challenge manager and launcher are ready finally! I wanted to have this so i can use it next year and not waste time creating it
+- added new logic for minification of day classes
+
 ###### Tasks
 
-- Clean up / optimize
 - Attempt to find online solutions for missing days 5,6,7,8. and refactor it into a class
-- Enhance JSDocs: Include console log in examples when `isLoggingEnabled` is true.
-- Improve JSDocs: Ensure all examples in the documentation are accurate and up-to-date.
-- Add story and the problem/solution in comments
-
+- Improve JSDocs in future: Ensure all examples in the documentation are accurate and up-to-date.

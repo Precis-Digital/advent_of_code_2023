@@ -31,6 +31,7 @@ module.exports = {
     'no-labels': 'off',
     'max-len': 'off',
     'no-loop-func': 'off',
+    'no-new': 'off',
   },
 
   globals: {
