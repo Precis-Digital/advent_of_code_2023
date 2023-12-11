@@ -14,7 +14,7 @@ class BaseEntry:
     def adjacent_indices(self) -> set[tuple[int, int]]:
         indices = set()
         for index in self.occupies:
-            indices.update(adjacent_indices(index=index))
+            indices.update(utils.adjacent_indices(index=index))
 
         return indices
 
@@ -98,19 +98,6 @@ class SchematicParser:
 
                     if not self.current_part_is_empty:
                         self.new_part()
-
-
-def adjacent_indices(index: tuple[int, int]) -> set[tuple[int, int]]:
-    return {
-        (index[0] - 1, index[1] - 1),
-        (index[0] - 1, index[1]),
-        (index[0] - 1, index[1] + 1),
-        (index[0], index[1] - 1),
-        (index[0], index[1] + 1),
-        (index[0] + 1, index[1] - 1),
-        (index[0] + 1, index[1]),
-        (index[0] + 1, index[1] + 1),
-    }
 
 
 def main() -> None:
