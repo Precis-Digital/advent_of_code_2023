@@ -95,3 +95,10 @@ func GCD(a, b int) int {
 	}
 	return GCD(b%a, a)
 }
+
+func Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
