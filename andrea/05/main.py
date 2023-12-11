@@ -281,10 +281,10 @@ class SeedMap:
                             input_range=(start, end, offset)))
 
 
-def solve_05(*,
-             step: int,
-             seeds_as_range=False,
-             alternative=False):
+def solve(*,
+          step: int,
+          seeds_as_range=False,
+          alternative=False):
     print('*' * 20, f"Step {step}{' Alternative' if alternative else ''}")
 
     seeds = None
@@ -367,7 +367,7 @@ def solve_05(*,
 
 
 if __name__ == '__main__':
-    solve_05(step=1)
-    solve_05(step=1, alternative=True)
-    # solve_05(step=2, seeds_as_range=True)
-    solve_05(step=2, seeds_as_range=True, alternative=True)
+    solve(step=1)
+    solve(step=1, alternative=True)
+    # solve(step=2, seeds_as_range=True)
+    solve(step=2, seeds_as_range=True, alternative=True)

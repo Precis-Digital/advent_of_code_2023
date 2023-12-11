@@ -8,8 +8,8 @@ re_clean_spaces = re.compile(r'\s+')
 print_progress = False
 
 
-def solve_06(*,
-             step: int):
+def solve(*,
+          step: int):
     print('*' * 20, f"Step {step}")
 
     times = None
@@ -69,5 +69,5 @@ def solve_06(*,
 
 
 if __name__ == '__main__':
-    solve_06(step=1)
-    solve_06(step=2)
+    solve(step=1)
+    solve(step=2)

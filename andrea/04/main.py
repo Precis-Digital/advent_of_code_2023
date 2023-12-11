@@ -17,7 +17,7 @@ def print_game_line(game_line: str,
     print(replaced_game_line)
 
 
-def solve_04_01(print_progress: bool = False):
+def solve_01(print_progress: bool = False):
     print('*' * 20, 'Step 1')
 
     result = 0
@@ -38,7 +38,7 @@ def solve_04_01(print_progress: bool = False):
     print('*' * 20, 'Step 1', result)
 
 
-def solve_04_02(print_progress: bool = False):
+def solve_02(print_progress: bool = False):
     print('*' * 20, 'Step 1')
 
     num_cards = 0
@@ -77,5 +77,5 @@ def solve_04_02(print_progress: bool = False):
 
 
 if __name__ == '__main__':
-    solve_04_01()
-    solve_04_02()
+    solve_01()
+    solve_02()
