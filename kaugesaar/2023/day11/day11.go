@@ -31,7 +31,7 @@ func parser() ([][]rune, [][2]int) {
 	return universe, galaxies
 }
 
-func exapandGalaxies(universe [][]rune, galaxies [][2]int) [][2]int {
+func exapandGalaxies(universe [][]rune, galaxies [][2]int, expansion int) [][2]int {
 	rows, cols := len(universe), len(universe[0])
 
 	var emptyRows, emptyCols []int
@@ -66,7 +66,7 @@ func exapandGalaxies(universe [][]rune, galaxies [][2]int) [][2]int {
 		r := emptyRows[i]
 		for j := range galaxies {
 			if galaxies[j][0] > r {
-				galaxies[j][0]++
+				galaxies[j][0] += expansion
 			}
 		}
 	}
@@ -75,7 +75,7 @@ func exapandGalaxies(universe [][]rune, galaxies [][2]int) [][2]int {
 		c := emptyCols[i]
 		for j := range galaxies {
 			if galaxies[j][1] > c {
-				galaxies[j][1]++
+				galaxies[j][1] += expansion
 			}
 		}
 	}
@@ -85,7 +85,7 @@ func exapandGalaxies(universe [][]rune, galaxies [][2]int) [][2]int {
 
 func p1() string {
 	universe, galaxies := parser()
-	galaxies = exapandGalaxies(universe, galaxies)
+	galaxies = exapandGalaxies(universe, galaxies, 1)
 	sum := 0
 	for i := 0; i < len(galaxies); i++ {
 		for j := i + 1; j < len(galaxies); j++ {
@@ -96,7 +96,15 @@ func p1() string {
 }
 
 func p2() string {
-	return utils.ToStr(2)
+	universe, galaxies := parser()
+	galaxies = exapandGalaxies(universe, galaxies, 1e6-1)
+	sum := 0
+	for i := 0; i < len(galaxies); i++ {
+		for j := i + 1; j < len(galaxies); j++ {
+			sum += utils.Abs(galaxies[i][0]-galaxies[j][0]) + utils.Abs((galaxies[i][1] - galaxies[j][1]))
+		}
+	}
+	return utils.ToStr(sum)
 }
 
 // Part1 the solution for part 1, day 11
