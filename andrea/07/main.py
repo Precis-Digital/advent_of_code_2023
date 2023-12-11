@@ -16,8 +16,8 @@ re_jokers = re.compile(r'(J+)')
 ranks = [1, 2, 2.2, 3, 3.2, 4, 5]
 
 
-def solve_06(*,
-             step: int):
+def solve(*,
+          step: int):
     print('*' * 20, f"Step {step}")
 
     hands_bids = []
@@ -50,5 +50,5 @@ def solve_06(*,
 
 
 if __name__ == '__main__':
-    solve_06(step=1)
-    solve_06(step=2)
+    solve(step=1)
+    solve(step=2)

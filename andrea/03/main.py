@@ -25,7 +25,7 @@ def parse_and_fill_matrix(game_line: str,
         raise
 
 
-def solve_03_01():
+def solve_01():
     print('*' * 20, 'Step 1')
     re_number = re.compile(r'(\d+)')
     re_symbol = re.compile(r'([^0-9.\r\n]+)')
@@ -61,7 +61,7 @@ def add_number_to_gear(gears: dict[tuple],
         gears[coords].append(int(number))
 
 
-def solve_03_02():
+def solve_02():
     print('*' * 20, 'Step 2')
     re_number = re.compile(r'(\d+)')
     re_gear = re.compile(r'(\*)')
@@ -94,5 +94,5 @@ def solve_03_02():
 
 
 if __name__ == '__main__':
-    solve_03_01()
-    solve_03_02()
+    solve_01()
+    solve_02()

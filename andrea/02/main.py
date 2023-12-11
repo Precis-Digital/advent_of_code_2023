@@ -1,7 +1,7 @@
 import re
 
 
-def solve_02_01():
+def solve_01():
     print('*' * 20, 'Step 1')
     bag = {'red': 12,
            'green': 13,
@@ -29,7 +29,7 @@ def solve_02_01():
         print('*' * 20, 'Step 1', result)
 
 
-def solve_02_02():
+def solve_02():
     print('*' * 20, 'Step 2')
     colors = ['red',
               'green',
@@ -56,5 +56,5 @@ def solve_02_02():
 
 
 if __name__ == '__main__':
-    solve_02_01()
-    solve_02_02()
+    solve_01()
+    solve_02()
