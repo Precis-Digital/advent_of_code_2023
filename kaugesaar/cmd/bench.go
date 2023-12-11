@@ -60,7 +60,7 @@ func runBenchmark(t *testing.B) {
 func bench(solve func() solution.Response, day int, part int) {
 	benchmark.f = solve
 	t := testing.Benchmark(runBenchmark)
-	fmt.Printf("|  %d  |  %d   | %s |\n", day, part, forHumans(t.NsPerOp()))
+	fmt.Printf("|  %d  |  0%d   | %s |\n", day, part, forHumans(t.NsPerOp()))
 }
 
 func toMs(nsPerOp int64) float64 {
