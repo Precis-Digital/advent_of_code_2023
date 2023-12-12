@@ -9,6 +9,13 @@ import (
 // Solver for day 10 and its both parts
 type Solver struct{}
 
+const (
+	Up int = iota
+	Right
+	Down
+	Left
+)
+
 func parser() ([][][4]bool, [2]int) {
 	rows := utils.ReadFile("day10.txt")
 	var start [2]int
@@ -61,18 +68,18 @@ func findLoop(graph [][][4]bool, start [2]int) (map[[2]int]bool, bool) {
 		visited[[2]int{row, col}] = true
 		cameFrom := 0
 		switch dir {
-		case 0:
+		case Up:
 			row--
-			cameFrom = 2
-		case 1:
+			cameFrom = Down
+		case Right:
 			col++
-			cameFrom = 3
-		case 2:
+			cameFrom = Left
+		case Down:
 			row++
-			cameFrom = 0
-		case 3:
+			cameFrom = Up
+		case Left:
 			col--
-			cameFrom = 1
+			cameFrom = Right
 		default:
 			panic("Invalid direction")
 		}
