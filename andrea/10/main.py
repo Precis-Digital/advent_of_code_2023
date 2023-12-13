@@ -15,7 +15,7 @@ connection_points: dict[
     'F': ((0, 1), (1, 0), -1, ([], [(-1, 0), (0, -1)]))
 }
 
-right_left_turns: dict[tuple[tuple[int, int], tuple[int, int]], tuple[int, list[tuple[int, int]]]] = {
+right_left_turns: dict[tuple[tuple[int, int], tuple[int, int]], tuple[int, tuple[list[tuple[int, int]], list[tuple[int, int]]]]] = {
     (entry_diff, exit_diff): (right_left, left_right_diffs)
     for entry_diff, exit_diff, right_left, left_right_diffs in connection_points.values()
 }
