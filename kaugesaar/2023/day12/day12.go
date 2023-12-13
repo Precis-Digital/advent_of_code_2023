@@ -27,14 +27,23 @@ func parser() ([]string, [][]int) {
 	return springs, nums
 }
 
-func possibleWays(cache map[[3]int]int, springs string, within *int, remaining []int) int {
+func encodeState(springsLen, withinVal, remainingLen int) int {
+	return (springsLen << 20) | (withinVal << 10) | remainingLen
+}
+
+func possibleWays(cache map[int]int, springs string, within *int, remaining []int) int {
 	withinVal := 0
 	if within != nil {
 		withinVal = *within
 	}
-	key := [3]int{len(springs), withinVal, len(remaining)}
+
+	key := encodeState(len(springs), withinVal, len(remaining))
 	if val, ok := cache[key]; ok {
 		return val
+	}
+
+	if len(remaining) > 0 && withinVal > remaining[0] {
+		return 0
 	}
 
 	if len(springs) == 0 {
@@ -92,7 +101,7 @@ func p1() string {
 	springs, nums := parser()
 	sum := 0
 	for i := range springs {
-		sum += possibleWays(make(map[[3]int]int), springs[i], nil, nums[i])
+		sum += possibleWays(make(map[int]int), springs[i], nil, nums[i])
 	}
 	return utils.ToStr(sum)
 }
@@ -106,7 +115,7 @@ func p2() string {
 		for j := 0; j < 5; j++ {
 			unfoldedNums = append(unfoldedNums, nums[i]...)
 		}
-		sum += possibleWays(make(map[[3]int]int), unfoldedSprings, nil, unfoldedNums)
+		sum += possibleWays(make(map[int]int), unfoldedSprings, nil, unfoldedNums)
 	}
 	return utils.ToStr(sum)
 }
