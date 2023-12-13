@@ -8,6 +8,27 @@ import (
 	"strings"
 )
 
+func ReadFileByNN(filename string) [][]string {
+	rows := ReadFile(filename)
+	var lines [][]string
+	var line []string
+
+	for i, row := range rows {
+		if len(row) == 0 {
+			line = make([]string, 0)
+			continue
+		}
+
+		line = append(line, row)
+
+		if len(rows)-1 == i || len(rows[i+1]) == 0 {
+			lines = append(lines, line)
+		}
+	}
+
+	return lines
+}
+
 func ReadFile(filename string) []string {
 	rows := []string{}
 

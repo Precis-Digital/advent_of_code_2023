@@ -3,7 +3,6 @@ package day13
 import (
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
-	"strings"
 )
 
 // Solver for day 13 and its both parts
@@ -15,34 +14,18 @@ type Pattern struct {
 }
 
 func parser() []Pattern {
-	rows := utils.ReadFile("day13.txt")
-	var lines [][][]string
-	var line [][]string
-
-	for i, row := range rows {
-		if len(row) == 0 {
-			line = make([][]string, 0)
-			continue
-		}
-
-		line = append(line, strings.Split(row, ""))
-
-		if len(rows)-1 == i || len(rows[i+1]) == 0 {
-			lines = append(lines, line)
-		}
-	}
+	lines := utils.ReadFileByNN("day13.txt")
 
 	var patterns []Pattern
 
 	for _, l := range lines {
 		rows, cols := len(l), len(l[0])
-
 		var p Pattern
 
 		for c := 0; c < cols; c++ {
 			var col string
 			for r := 0; r < rows; r++ {
-				col += l[r][c]
+				col += string(l[r][c])
 			}
 			p.cols = append(p.cols, col)
 		}
@@ -50,7 +33,7 @@ func parser() []Pattern {
 		for r := 0; r < rows; r++ {
 			var row string
 			for c := 0; c < cols; c++ {
-				row += l[r][c]
+				row += string(l[r][c])
 			}
 			p.rows = append(p.rows, row)
 		}
