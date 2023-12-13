@@ -46,24 +46,62 @@ func parser() []Pattern {
 
 func findReflection(patterns []string, multiplier int) int {
 	for i := 1; i < len(patterns); i++ {
-		curr, prev := i, i-1
+		if patterns[i] != patterns[i-1] {
+			continue
+		}
 
-		if patterns[curr] == patterns[prev] {
-			x, y := curr, prev
-			isValidReflection := true
+		x, y := i, i-1
+		isValidReflection := true
 
-			for j := 0; j < utils.MinInt(i, len(patterns)-i)-1; j++ {
-				x++
-				y--
-				if patterns[x] != patterns[y] {
+		for j := 0; j < utils.MinInt(i, len(patterns)-i)-1; j++ {
+			x++
+			y--
+			if patterns[x] != patterns[y] {
+				isValidReflection = false
+				break
+			}
+		}
+
+		if isValidReflection {
+			return i * multiplier
+		}
+	}
+
+	return 0
+}
+
+func cleanTheSmudgeAndFindReflection(patterns []string, multiplier int) int {
+	for i := 1; i < len(patterns); i++ {
+		levenDistance := utils.LevenshteinDistance(patterns[i], patterns[i-1])
+		if levenDistance > 1 {
+			continue
+		}
+
+		foundSmudge := levenDistance == 1
+		x, y := i, i-1
+		isValidReflection := true
+
+		for j := 0; j < utils.MinInt(i, len(patterns)-i)-1; j++ {
+			x++
+			y--
+			levenDistance = utils.LevenshteinDistance(patterns[x], patterns[y])
+			if levenDistance > 1 {
+				isValidReflection = false
+				break
+			}
+
+			if levenDistance == 1 {
+				if foundSmudge {
 					isValidReflection = false
 					break
+				} else {
+					foundSmudge = true
 				}
 			}
+		}
 
-			if isValidReflection {
-				return i * multiplier
-			}
+		if isValidReflection && foundSmudge {
+			return i * multiplier
 		}
 	}
 
@@ -81,7 +119,13 @@ func p1() string {
 }
 
 func p2() string {
-	return utils.ToStr(2)
+	patterns := parser()
+	sum := 0
+	for _, pattern := range patterns {
+		sum += cleanTheSmudgeAndFindReflection(pattern.rows, 100)
+		sum += cleanTheSmudgeAndFindReflection(pattern.cols, 1)
+	}
+	return utils.ToStr(sum)
 }
 
 // Part1 the solution for part 1, day 13
