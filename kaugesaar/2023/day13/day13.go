@@ -9,102 +9,59 @@ import (
 type Solver struct{}
 
 type Pattern struct {
-	cols []string
-	rows []string
+	cols [][]byte
+	rows [][]byte
 }
 
 func parser() []Pattern {
 	lines := utils.ReadFileByNN("day13.txt")
 
-	var patterns []Pattern
+	patterns := make([]Pattern, len(lines))
 
-	for _, l := range lines {
-		rows, cols := len(l), len(l[0])
+	for l, line := range lines {
+		rows, cols := len(line), len(line[0])
 		var p Pattern
+		p.cols = make([][]byte, cols)
+		p.rows = make([][]byte, rows)
 
 		for c := 0; c < cols; c++ {
-			var col string
+			col := make([]byte, rows)
 			for r := 0; r < rows; r++ {
-				col += string(l[r][c])
+				col[r] = line[r][c]
 			}
-			p.cols = append(p.cols, col)
+			p.cols[c] = col
 		}
 
 		for r := 0; r < rows; r++ {
-			var row string
+			row := make([]byte, cols)
 			for c := 0; c < cols; c++ {
-				row += string(l[r][c])
+				row[c] = line[r][c]
 			}
-			p.rows = append(p.rows, row)
+			p.rows[r] = row
 		}
 
-		patterns = append(patterns, p)
+		patterns[l] = p
 	}
 
 	return patterns
 }
 
-func findReflection(patterns []string, multiplier int) int {
-	for i := 1; i < len(patterns); i++ {
-		if patterns[i] != patterns[i-1] {
-			continue
-		}
-
-		x, y := i, i-1
-		isValidReflection := true
-
-		for j := 0; j < utils.MinInt(i, len(patterns)-i)-1; j++ {
-			x++
-			y--
-			if patterns[x] != patterns[y] {
-				isValidReflection = false
-				break
-			}
-		}
-
-		if isValidReflection {
-			return i * multiplier
-		}
-	}
-
-	return 0
-}
-
-func cleanTheSmudgeAndFindReflection(patterns []string, multiplier int) int {
-	for i := 1; i < len(patterns); i++ {
-		levenDistance := utils.LevenshteinDistance(patterns[i], patterns[i-1])
-		if levenDistance > 1 {
-			continue
-		}
-
-		foundSmudge := levenDistance == 1
-		x, y := i, i-1
-		isValidReflection := true
-
-		for j := 0; j < utils.MinInt(i, len(patterns)-i)-1; j++ {
-			x++
-			y--
-			levenDistance = utils.LevenshteinDistance(patterns[x], patterns[y])
-			if levenDistance > 1 {
-				isValidReflection = false
-				break
-			}
-
-			if levenDistance == 1 {
-				if foundSmudge {
-					isValidReflection = false
-					break
-				} else {
-					foundSmudge = true
+func findReflection(pattern [][]byte, smudges, multiplier int) int {
+	for i := 0; i < len(pattern)-1; i++ {
+		mismatch := 0
+		for j := 0; j <= utils.MinInt(i, len(pattern)-i-2); j++ {
+			x := i - j
+			y := i + 1 + j
+			for c := range pattern[0] {
+				if pattern[x][c] != pattern[y][c] {
+					mismatch++
 				}
 			}
 		}
-
-		if isValidReflection && foundSmudge {
-			return i * multiplier
+		if mismatch == smudges {
+			return (1 + i) * multiplier
 		}
 	}
-
 	return 0
 }
 
@@ -112,8 +69,8 @@ func p1() string {
 	patterns := parser()
 	sum := 0
 	for _, pattern := range patterns {
-		sum += findReflection(pattern.rows, 100)
-		sum += findReflection(pattern.cols, 1)
+		sum += findReflection(pattern.rows, 0, 100)
+		sum += findReflection(pattern.cols, 0, 1)
 	}
 	return utils.ToStr(sum)
 }
@@ -122,8 +79,8 @@ func p2() string {
 	patterns := parser()
 	sum := 0
 	for _, pattern := range patterns {
-		sum += cleanTheSmudgeAndFindReflection(pattern.rows, 100)
-		sum += cleanTheSmudgeAndFindReflection(pattern.cols, 1)
+		sum += findReflection(pattern.rows, 1, 100)
+		sum += findReflection(pattern.cols, 1, 1)
 	}
 	return utils.ToStr(sum)
 }
