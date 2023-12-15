@@ -15,6 +15,7 @@ import (
 	"kaugesaar-aoc/2023/day12"
 	"kaugesaar-aoc/2023/day13"
 	"kaugesaar-aoc/2023/day14"
+	"kaugesaar-aoc/2023/day15"
 	"kaugesaar-aoc/solution"
 
 	"github.com/spf13/cobra"
@@ -35,6 +36,7 @@ var solvers = []solution.Solver{
 	day12.Solver{},
 	day13.Solver{},
 	day14.Solver{},
+	day15.Solver{},
 }
 
 // NewCLI returns the root command for the CLI
