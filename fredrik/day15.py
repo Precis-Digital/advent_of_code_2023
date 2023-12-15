@@ -69,13 +69,15 @@ def part2(sequence: list[str]) -> int:
                     break
             else:
                 boxes[lens.box].append(lens)
+        else:
+            raise ValueError(f"Invalid operation {lens.operation}")
 
-    tot = 0
-    for i, box in boxes.items():
+    total_focusing_power = 0
+    for box in boxes.values():
         for j, lens in enumerate(box):
-            tot += (j + 1) * lens.partial_focusing_power
+            total_focusing_power += (j + 1) * lens.partial_focusing_power
 
-    return tot
+    return total_focusing_power
 
 
 def main() -> None:
