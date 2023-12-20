@@ -124,11 +124,12 @@ def solve(*,
             for x in range(num_x):
                 point = matrix_loop.get((y, x))
                 if point is None:
-                    if print_progress[step-1]:
-                        if inside:
-                            num_inside += 1
+                    if inside:
+                        num_inside += 1
+                        if print_progress[step - 1]:
                             print('+', end='')
-                        else:
+                    else:
+                        if print_progress[step - 1]:
                             print(' ', end='')
                 elif point < 0:
                     inside = False
