@@ -1,0 +1,31 @@
+{
+    "source": {
+      "include": ["./src", "index.js"],
+      "includePattern": ".+\\.js(doc|x)?$",
+      "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "tags": {
+      "allowUnknownTags": ["category", "subcategory"]
+    },
+    "plugins": [
+      "node_modules/better-docs/category"
+    ],
+    "opts": {
+      "readme": "readme.md",
+      "destination": "./docs/",
+      "encoding": "utf8",
+      "private": true,
+      "recurse": true,
+      "template": "node_modules/better-docs"
+    },
+    "templates": {
+      "cleverLinks": false,
+      "monospaceLinks": false,
+      "search": false,
+    
+      "better-docs": {
+          "css": "dont-remove/style.css",
+          "hideGenerator": true 
+      }
+    }
+  }

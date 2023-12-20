@@ -1,0 +1,426 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> days/day3/class.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="dont-remove/style.css">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="ChallengeLauncher.html">ChallengeLauncher</a></li><li><a href="Day1.html">Day1</a></li><li><a href="Day2.html">Day2</a></li><li><a href="Day3.html">Day3</a></li><li><a href="Day4.html">Day4</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>days/day3/class.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import chalk from 'chalk';
+
+/**
+ * @class
+ *
+ * @description This class is used to process a string of data lines and perform various operations on it.
+ * It includes methods to generate a range of numbers, determine positions to check based on a number,
+ * check if a number is part of any two-part gears, calculate the sum of the product of two-part gears,
+ * and process the numbers and update the potential gears and total sum.
+ *
+ * @property {string} dataLines - The data lines to process.
+ * @property {boolean} isLoggingEnabled - A flag indicating whether logging is enabled.
+ * @property {Array} gears - An array to store the gears.
+ * @property {number} totalSum - The total sum of the product of two-part gears.
+ *
+ * @example
+ * const dataLines = "467..114...";
+ * const isLoggingEnabled = true;
+ * const instance = new Day3(dataLines, isLoggingEnabled);
+ * console.log(instance); // log output here
+ */
+export class Day3 {
+  /**
+   * Constructs a new instance of the class with the provided data lines and logging flag.
+   *
+   * @param {string} dataLines - The data lines to process.
+   * @param {boolean} isLoggingEnabled - A flag indicating whether logging is enabled.
+   *
+   * @example
+   * const dataLines = "467..114..\n...*......\n..35..633.\n......#...\n617*......\n.....+.58.\n..592.....\n......755.\n...$.*....\n.664.598..";
+   * const isLoggingEnabled = true;
+   * const instance = new ClassName(dataLines, isLoggingEnabled);
+   * console.log(instance); // log output here
+   */
+  constructor(dataLines, isLoggingEnabled) {
+    this.dataLines = dataLines;
+    this.isLoggingEnabled = isLoggingEnabled;
+    this.time = {};
+    this.totalSum = {
+      part1: 0,
+      part2: 0,
+    };
+
+    // Cache the regular expressions
+    this.symbolRegexp = /[^0-9.\n]/g;
+    this.numberRegexp = /[0-9]+/g;
+
+    // Define start and end as properties of the class
+    this.start = 0;
+    this.end = 0;
+
+    this.symbolPositions = [...this.dataLines.matchAll(this.symbolRegexp)].map(match => match.index);
+    this.numbers = [...this.dataLines.matchAll(this.numberRegexp)].map(match => [match[0], match.index, match[0].length]);
+    this.lineLength = this.dataLines.indexOf('\n') + 1;
+    this.potentialGears = Array.from({ length: this.symbolPositions.length }, () => []);
+  }
+
+  // Helper methods
+
+  /**
+   * Generates a range of numbers between the start and end parameters.
+   *
+   * @param {number} start - The start of the range.
+   * @param {number} end - The end of the range.
+   * @returns {Array} - Returns an array of numbers between the start and end parameters.
+   *
+   * @example
+   * const start = 1;
+   * const end = 5;
+   * const range = instance.generateNumberRange(start, end);
+   * console.log(range); // log output here
+   */
+  generateNumberRange(start, end) {
+    // Reset start and end properties each time the function is called
+    this.start = start;
+    this.end = end;
+
+    // Generate the number range using start and end
+    return Array.from({ length: this.end - this.start }, (_, i) => this.start + i);
+  }
+
+  /**
+   * Determines the positions to check based on the provided number.
+   *
+   * @param {Array} number - The number to check.
+   * @returns {Array} - Returns an array of positions to check.
+   *
+   * @example
+   * const number = [1, 2, 3];
+   * const positions = instance.getPositionsToCheck(number);
+   * console.log(positions); // log output here
+   */
+  getPositionsToCheck(number) {
+    const isEdgeLeft = number[1] % this.lineLength === 0;
+    const isEdgeRight = (number[1] + number[2] + 1) % this.lineLength === 0;
+    const positionsToCheck = [
+      ...this.generateNumberRange(number[1] - (!isEdgeLeft &amp;&amp; 1) - this.lineLength, number[1] + number[2] - this.lineLength + (!isEdgeRight &amp;&amp; 1)),
+      !isEdgeLeft &amp;&amp; number[1] - 1,
+      !isEdgeRight &amp;&amp; number[1] + number[2],
+      ...this.generateNumberRange(number[1] - (!isEdgeLeft &amp;&amp; 1) + this.lineLength, number[1] + number[2] + this.lineLength + (!isEdgeRight &amp;&amp; 1)),
+    ];
+    return positionsToCheck.filter(position => position >= 0 &amp;&amp; position &lt; this.dataLines.length);
+  }
+
+  // Part 1 related methods
+
+  /**
+   * Checks if a number is part of any two-part gears.
+   *
+   * @param {Array} number - The number to check.
+   * @returns {boolean} - Returns true if the number is part of any two-part gears, otherwise false.
+   *
+   * @example
+   * const input = [1, 2];
+   * const isPart = instance.isPart(input);
+   * console.log(isPart); // log output here
+   */
+  isPart(number) {
+    const positionsToCheck = this.getPositionsToCheck(number);
+    return positionsToCheck.some(position => this.symbolPositions.includes(position));
+  }
+
+  /**
+   * Calculates the sum of the product of two-part gears.
+   *
+   * @returns {number} - Returns the sum of the product of two-part gears.
+   *
+   * @example
+   * const sum = instance.calculatePart1Sum();
+   * console.log(sum); // log output here
+   */
+  calculatePart1Sum() {
+    let sum = 0;
+    this.numbers.forEach((number) => {
+      if (this.isPart(number)) {
+        sum += parseInt(number[0], 10);
+      }
+    });
+    return sum;
+  }
+
+  /**
+   * Processes the numbers and updates the potential gears and total sum.
+   *
+   * @example
+   * instance.part1();
+   * console.log(instance.totalSum.part1); // log output here
+   */
+  part1() {
+    this.totalSum.part1 = this.processNumbers(this.isPart.bind(this), 'part1');
+  }
+
+  // Part 2 related methods
+
+  /**
+   * Checks if a number is part of any two-part gears.
+   *
+   * @param {Array} number - The number to check.
+   * @returns {boolean} - Returns true if the number is part of any two-part gears, otherwise false.
+   *
+   * @example
+   * const input = [1, 2];
+   * const isGear = instance.isGear(input);
+   * console.log(isGear); // log output here
+   */
+  isGear(number) {
+    // Filter out the gears that have exactly two parts
+    const gearsWithTwoParts = this.potentialGears.filter(gear => gear.length === 2);
+
+    // Check if the number is part of any of the two-part gears
+    for (const gear of gearsWithTwoParts) {
+      for (const item of gear) {
+        if (item.every((val, index) => val === number[index])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Calculates the sum of the product of two-part gears.
+   *
+   * @returns {number} - Returns the sum of the product of two-part gears.
+   *
+   * @example
+   * const sum = instance.calculatePart2Sum();
+   * console.log(sum); // log output here
+   */
+  calculatePart2Sum() {
+    return this.potentialGears.reduce((total, gear) => {
+      const isGear = gear.length === 2;
+      return isGear ? total + parseInt(gear[0], 10) * parseInt(gear[1], 10) : total;
+    }, 0);
+  }
+
+  /**
+   * Processes the numbers and updates the potential gears and total sum.
+   *
+   * @example
+   * instance.part2();
+   * console.log(instance.totalSum.part2); // log output here
+   */
+  part2() {
+    for (const number of this.numbers) {
+      const positionsToCheck = this.getPositionsToCheck(number);
+      for (const position of positionsToCheck) {
+        const symbolIndex = this.symbolPositions.findIndex(p => p === position);
+        if (symbolIndex >= 0) {
+          this.potentialGears[symbolIndex].push(number);
+        }
+      }
+    }
+    this.totalSum.part2 = this.processNumbers(this.isGear.bind(this), 'part2');
+  }
+
+  // Shared methods
+
+  /**
+   * Processes numbers based on the provided condition and part.
+   *
+   * @param {Function} matchesCondition - A function that takes a number and returns a boolean.
+   * @param {string} part - A string that indicates the part of the process to execute ('part1' or 'part2').
+   * @returns {number} The sum of the numbers that match the condition.
+   *
+   * @example
+   * const input = (num) => num % 2 === 0;
+   * const sum = processNumbers(input, 'part1');
+   * console.log(sum); // Logs the sum of even numbers if 'part1' is executed.
+   */
+  processNumbers(matchesCondition, part) {
+    let sum = 0;
+
+    if (part === 'part1') {
+      sum = this.calculatePart1Sum();
+    } else if (part === 'part2') {
+      sum = this.calculatePart2Sum();
+    }
+
+    if (this.isLoggingEnabled) {
+      this.logHighlights(matchesCondition, part);
+    }
+    return sum;
+  }
+
+  /**
+   * Logs and highlights numbers and symbols based on the provided condition and part.
+   *
+   * @param {Function} matchesCondition - A function that takes a number and returns a boolean.
+   * @param {string} part - A string that indicates the part of the process to execute ('part1' or 'part2').
+   * @returns {string} The formatted and highlighted input.
+   *
+   * @example
+   * const input = (num) => num % 2 === 0;
+   * const formattedInput = logyHighlights(input, 'part1');
+   * console.log(formattedInput); // Logs the formatted and highlighted input if 'part1' is executed.
+   */
+  logHighlights(matchesCondition, part) {
+    const lines = this.dataLines.split('\n');
+    let sum = 0;
+    let pairs = [];
+    const products = [];
+
+    const highlightNumbers = (line) => {
+      this.numbers.forEach((number) => {
+        const replacement = matchesCondition(number) ? chalk.green(number[0]) : chalk.red(number[0]);
+        const regex = new RegExp(`\\b${number[0]}\\b`, 'g');
+        line = line.replace(regex, replacement);
+      });
+      return line;
+    };
+
+    const highlightSymbols = (line) => {
+      this.symbolPositions.forEach((position) => {
+        const symbol = this.dataLines[position];
+        const escapedSymbol = symbol.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&amp;');
+        const regex = new RegExp(`${escapedSymbol}`, 'g');
+        line = line.replaceAll(regex, chalk.cyanBright(symbol));
+      });
+      return line;
+    };
+
+    const addChalkGray = (line) => {
+      const chalkRegex = /\\u001b\[\d+m/g;
+      return !chalkRegex.test(line) ? chalk.gray(line) : line;
+    };
+
+    const formatLine = (line, index) => {
+      let modifiedLine = line;
+      modifiedLine = highlightNumbers(modifiedLine);
+      modifiedLine = highlightSymbols(modifiedLine);
+      modifiedLine = addChalkGray(modifiedLine);
+
+      if (matchesCondition(this.numbers[index])) {
+        pairs.push(this.numbers[index][0]);
+
+        if (pairs.length === 2) {
+          const product = pairs.reduce((a, b) => a * b);
+          if (product > 0) {
+            products.push(product);
+          }
+          pairs = [];
+        }
+      }
+
+      sum += matchesCondition(this.numbers[index]) ? parseInt(this.numbers[index][0], 10) : 0;
+      const sumPart2 = products.reduce((a, b) => a + b, 0);
+
+      modifiedLine += ` ${chalk.blue('points:')} ${matchesCondition(this.numbers[index]) ? chalk.yellow(this.numbers[index][0].padEnd(4, ' ')) : chalk.red('0'.padEnd(4, ' '))} ${chalk.blue('total:')} ${chalk.yellow(part === 'part1' ? sum : sumPart2)}`;
+      return modifiedLine;
+    };
+
+    const modifiedLines = lines.map(formatLine);
+    const formattedInput = modifiedLines.join('\n');
+    console.log(formattedInput);
+
+    return formattedInput;
+  }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+
+</body>
+</html>

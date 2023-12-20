@@ -1,0 +1,35 @@
+{
+  "name": "aoc2023",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "ChallengeManager.js",
+  "scripts": {
+    "start": "node ChallengeManager.js start $npm_config_day $npm_config_minify",
+    "minified": "node ChallengeManager.js minified $npm_config_day",
+    "docs": "jsdoc -c jsdoc.json -t ./node_modules/better-docs"
+  },
+  "author": "Gianni Marsiglia",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/eslint-parser": "^7.18.9",
+    "better-docs": "^2.7.2",
+    "chalk": "^5.3.0",
+    "cli-spinner": "^0.2.10",
+    "cross-var": "^1.1.0",
+    "eslint": "^7.31.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-only-warn": "^1.0.3",
+    "eslint-plugin-promise": "^5.1.0",
+    "esm": "^3.2.25",
+    "jsdoc": "^4.0.2",
+    "jsdoc3-bootstrap": "^0.15.0",
+    "minify": "^10.5.2",
+    "npm-run-all": "^4.1.5",
+    "taffydb": "^2.7.3",
+    "uglify-js": "^3.17.4"
+  }
+}

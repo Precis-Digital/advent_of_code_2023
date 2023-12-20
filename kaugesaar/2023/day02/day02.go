@@ -1,15 +1,11 @@
 package day02
 
 import (
-	_ "embed" // For embedding the input file
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"regexp"
 	"strings"
 )
-
-//go:embed day2.txt
-var fileInput string
 
 // Solver for day 2 and its both parts
 type Solver struct{}
@@ -30,7 +26,7 @@ var (
 )
 
 func parser() []Game {
-	rows := strings.Split(fileInput, "\n")
+	rows := utils.ReadFile("day2.txt")
 
 	var games []Game
 

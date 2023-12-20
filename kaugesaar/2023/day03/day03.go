@@ -1,104 +1,64 @@
 package day03
 
 import (
-	_ "embed" // For embedding the input file
-	"fmt"
 	"kaugesaar-aoc/solution"
 	"kaugesaar-aoc/utils"
 	"regexp"
-	"strings"
 	"unicode"
 )
-
-//go:embed day3.txt
-var fileInput string
 
 // Solver for day 3 and its both parts
 type Solver struct{}
 
-// Cell is a cell in the schematic
-type Cell struct {
-	value            string
-	isSymbol         bool
-	isNumber         bool
-	isVisited        bool
-	isGear           bool
-	nAdjacentNumbers int
-	adjacentNumbers  []int
+type Point struct {
+	X int
+	Y int
 }
 
-var (
-	symbolRegex     = regexp.MustCompile(`[^\.0-9]`)
-	digitRegex      = regexp.MustCompile(`(\d+|[^\d])`)
-	numberCells     = make(map[string]*Cell)
-	parsedSchematic = parseSchematic()
-)
+func parser() map[Point][]int {
+	directions := []Point{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}
+	rows := utils.ReadFile("day3.txt")
+	digitRe := regexp.MustCompile(`\d+`)
 
-func createOrGetCell(s string, row, start, end int) *Cell {
-	cord := fmt.Sprintf("%d%d%d", row, start, end)
-	if unicode.IsDigit(rune(s[0])) {
-
-		if cell, exists := numberCells[cord]; exists {
-			return cell
-		}
-
-		cell := &Cell{
-			value:    s,
-			isNumber: true,
-		}
-		numberCells[cord] = cell
-		return cell
-	}
-
-	return &Cell{
-		value:    s,
-		isSymbol: isSymbol(s),
-		isGear:   isGear(s),
-	}
-}
-
-func isGear(s string) bool {
-	return s == "*"
-}
-
-func isSymbol(s string) bool {
-	return symbolRegex.MatchString(s)
-}
-
-func parseSchematic() [][]*Cell {
-	var schematic [][]*Cell
-	rows := strings.Split(fileInput, "\n")
-
-	for x, row := range rows {
-		var cells []*Cell
-		matches := digitRegex.FindAllStringIndex(row, -1)
-		for _, match := range matches {
-			start, end := match[0], match[1]
-			for i := start; i < end; i++ {
-				cells = append(cells, createOrGetCell(string(row[start:end]), x, start, end))
-			}
-		}
-		schematic = append(schematic, cells)
-	}
-
-	for x, row := range schematic {
-		for y, cell := range row {
-			if cell.isSymbol {
-				parseAdjacentNumbers(cell, schematic, x, y)
+	symbolMap := map[Point]rune{}
+	for y, str := range rows {
+		for x, r := range str {
+			if r != '.' && !unicode.IsDigit(r) {
+				symbolMap[Point{X: x, Y: y}] = r
 			}
 		}
 	}
 
-	return schematic
+	partsMap := map[Point][]int{}
+	for y, str := range rows {
+		for _, match := range digitRe.FindAllStringIndex(str, -1) {
+			bounds := map[Point]struct{}{}
+			num := utils.ToInt(str[match[0]:match[1]])
+
+			for x := match[0]; x < match[1]; x++ {
+				for _, dir := range directions {
+					bounds[Point{X: x + dir.X, Y: y + dir.Y}] = struct{}{}
+				}
+			}
+
+			for part := range bounds {
+				if _, ok := symbolMap[part]; ok {
+					partsMap[part] = append(partsMap[part], num)
+				}
+			}
+		}
+	}
+
+	return partsMap
 }
 
 func p1() string {
+	parts := parser()
 	sum := 0
-	for _, row := range parsedSchematic {
-		for _, cell := range row {
-			if cell.isSymbol {
-				sum += utils.SumArr(cell.adjacentNumbers)
-			}
+
+	for _, partNums := range parts {
+		for _, nums := range partNums {
+			sum += nums
 		}
 	}
 
@@ -106,33 +66,16 @@ func p1() string {
 }
 
 func p2() string {
+	parts := parser()
 	sum := 0
-	for _, row := range parsedSchematic {
-		for _, cell := range row {
-			if cell.isGear && cell.nAdjacentNumbers == 2 {
-				sum += cell.adjacentNumbers[0] * cell.adjacentNumbers[1]
-			}
+
+	for _, partNums := range parts {
+		if len(partNums) == 2 {
+			sum += partNums[0] * partNums[1]
 		}
 	}
 
 	return utils.ToStr(sum)
-}
-
-func parseAdjacentNumbers(source *Cell, schematic [][]*Cell, x, y int) {
-	for dx := -1; dx <= 1; dx++ {
-		for dy := -1; dy <= 1; dy++ {
-			nx, ny := x+dx, y+dy
-			if nx >= 0 && nx < len(schematic) && ny >= 0 && ny < len(schematic[nx]) {
-				cell := schematic[nx][ny]
-				if cell.isNumber && cell.isVisited == false {
-					num := utils.ToInt(cell.value)
-					cell.isVisited = true
-					source.adjacentNumbers = append(source.adjacentNumbers, num)
-					source.nAdjacentNumbers++
-				}
-			}
-		}
-	}
 }
 
 // Part1 the solution for part 1, day 3

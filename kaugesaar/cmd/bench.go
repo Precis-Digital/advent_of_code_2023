@@ -60,9 +60,20 @@ func runBenchmark(t *testing.B) {
 func bench(solve func() solution.Response, day int, part int) {
 	benchmark.f = solve
 	t := testing.Benchmark(runBenchmark)
-	fmt.Printf("|  %d  |  %d   | %.3fms |\n", day, part, toMs(t.NsPerOp()))
+	fmt.Printf("|  %d  |  0%d  | %s |\n", day, part, forHumans(t.NsPerOp()))
 }
 
 func toMs(nsPerOp int64) float64 {
+	// check if ms or μs
+	// return 3 decimals
 	return float64(nsPerOp) / 1000000.0
+}
+
+func forHumans(nsPerOp int64) string {
+
+	if nsPerOp >= 10000 {
+		return fmt.Sprintf("%.3f%s", float64(nsPerOp)/1000000.0, "ms")
+	}
+
+	return fmt.Sprintf("%.3f%s", float64(nsPerOp)/1000.0, "μs")
 }

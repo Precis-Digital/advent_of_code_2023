@@ -1,7 +1,7 @@
 import re
 
 
-def solve_01_1():
+def solve_1():
     print('*' * 20, 'Step 1')
     re_digits = re.compile(r'(\d)')
     with open('input.txt', 'r') as input_file:
@@ -17,7 +17,7 @@ def solve_01_1():
         print('*' * 20, 'Step 1', result)
 
 
-def solve_01_2():
+def solve_2():
     print('*' * 20, 'Step 2')
     eng_digits = ['zero',
                   'one',
@@ -56,8 +56,8 @@ def solve_01_2():
 
 
 if __name__ == '__main__':
-    solve_01_1()
-    solve_01_2()
+    solve_1()
+    solve_2()
 
 # Output
 # 
