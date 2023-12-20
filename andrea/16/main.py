@@ -1,5 +1,3 @@
-import functools
-
 print_progress = [False, False]
 
 coords_directions = {

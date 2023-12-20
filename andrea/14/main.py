@@ -1,8 +1,6 @@
 import functools
 from numpy import shape, array, flip, arange, ndarray
 
-from utils.utils import performance
-
 print_progress = [False, False]
 
 directions_fall_array = {
