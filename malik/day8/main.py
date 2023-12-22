@@ -57,6 +57,8 @@ def problem2(instructions, graph):
     starting_nodes = [node for node in filter(lambda x: x.endswith('A'), graph)]
     shortest_paths = []
     for node in starting_nodes:
+
+        # just kinda of guessing that the shortest path to the first Z node is the best one. could construct a simple counter example that this is not always best (e.g. if a longer path is a multiple of another starting node)
         shortest_path = problem1(instructions, graph, starting_node_filter = lambda x: x == node, ending_node_filter = lambda x: x.endswith('Z'))
         shortest_paths.append(shortest_path)
 
