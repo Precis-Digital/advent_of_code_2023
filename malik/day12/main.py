@@ -2,6 +2,7 @@ import re
 import math
 from collections import Counter
 from math import gcd
+from functools import cache
 
 
 def extract_groups(record: str) -> list[str]:
@@ -101,8 +102,6 @@ def dfs(condition_record, contig_group):
 
 
 
-
-
 def problem1(records: list[tuple[str, list[int]]]) -> int:
     total = 0
     for condition_record, contig_group in records:
@@ -111,18 +110,53 @@ def problem1(records: list[tuple[str, list[int]]]) -> int:
     return total
 
 
-def problem2(records: list[tuple[str, list[int]]]) -> int:
-    return -1
-    total = 0
-    i, n = 0, len(records)
-    for condition_record, contig_group in records:
-        print('starting', i, n)
-        new_record, new_contig_group ='?'.join([condition_record for _ in range(5)]), contig_group*5
-        valid_states = dfs(new_record, new_contig_group)
-        print(len(valid_states), new_record, new_contig_group)
-        total += len(valid_states)
-        i += 1
+@cache
+def get_solution_count(condition_record, contig_group, num_in_current_group=0):
+    # print(condition_record, contig_group, num_in_current_group)
 
+    # so you've reached all valid stats
+    if len(contig_group) == 0:
+        # if there are still hashes left then it's not a valid solution
+        if '#' in condition_record:
+            return 0
+        return 1
+    
+    if len(condition_record) == 0 and len(contig_group) > 0:
+        return 0
+    
+    for s in condition_record:
+        if s == '#':
+            num_in_current_group += 1
+            return get_solution_count(condition_record[1:], contig_group, num_in_current_group)
+        elif s == '.':
+            if num_in_current_group == 0:
+                return get_solution_count(condition_record[1:], contig_group, 0)
+            elif num_in_current_group == contig_group[0]:
+                return get_solution_count(condition_record[1:], tuple(list(contig_group)[1:]), 0)  
+            else:
+                return 0
+        elif s == '?':
+            return get_solution_count("." + condition_record[1:], contig_group, num_in_current_group) + get_solution_count("#" + condition_record[1:], contig_group, num_in_current_group)
+        
+    
+def problem1dymanic(records: list[tuple[str, list[int]]]) -> int:
+    total = 0
+    for condition_record, contig_group in records:
+        total += get_solution_count(condition_record +".", tuple(contig_group))
+    return total
+
+def problem2(records: list[tuple[str, list[int]]]) -> int:
+    """
+    looked up the solution from the internet that it required using dynamic programming
+
+    did my own implementation of the solution based on the basic idea...
+    """
+    total = 0
+    for condition_record, contig_group in records:
+        print(condition_record, contig_group)
+        new_condition_record = "?".join(condition_record for _ in range(5))
+        new_contig_group = contig_group * 5
+        total += get_solution_count(new_condition_record +".", tuple(new_contig_group))
     return total
     
 
@@ -133,7 +167,8 @@ def main(fpath: str):
     print("tests------------------")
     tests()
     print("tests------------------")
-    print('Problem 1: ', problem1(records)) #7195
+    # print('Problem 1: ', problem1(records)) #7195
+    print('Problem 1(DP): ', problem1dymanic(records)) #7195
     print('Problem 2: ', problem2(records)) 
     return 0
 
