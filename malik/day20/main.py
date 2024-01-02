@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import re
 import math
-from collections import Counter
+from collections import Counter, deque
 from math import gcd
 from functools import cache
 import heapq
@@ -20,16 +20,6 @@ class Pulse(Enum):
 BUTTON_NODE = 'button'
 BROADCASTER_NODE = 'broadcaster'
 
-
-
-# @dataclass
-# class ButtonModule:
-#     """
-#     There is a single button module (named button). When it receives a pulse, it sends a pulse to the broadcast module.
-#     """
-#     node_id: str = BUTTON_NODE
-#     state: int = 0
-#     target_modules: tuple[str] = [BROADCASTER_NODE]
 
 @dataclass
 class BroadcastModule:
@@ -89,7 +79,7 @@ class ConjuctionModule:
 
     @property
     def state(self):
-        return tuple(v for _,v in  sorted(self._state.items(), key=lambda x: x[0]))
+        return tuple((k,v) for k,v in  sorted(self._state.items(), key=lambda x: x[0]))
 
     def _update_state(self, pulse: Pulse, source: str):
         self._state[source] = pulse
@@ -192,59 +182,51 @@ def parse_input(f):
 
 
 
-def run_simulation(graph: Graph, pulse: Pulse, stop_condition= None) -> Graph:
+def run_simulation(graph: Graph, pulse: Pulse, monitor_module= None) -> Graph:
     """
     Run one simulation
     """
 
     # print(graph.get_graph_state())
-    queue = []
+    queue = deque()
     queue.append((BUTTON_NODE, BROADCASTER_NODE, pulse))
     # heapq.heappush(queue, ((1, (0, )), )
 
-    visited_graph = set()
     high_pulse_count = 0
     low_pulse_count = 0
+
+
+    kc_node_flash_high = []
+
 
     # for k,v in graph.graph.items():
     #     print(f">>>> Node:{k:<11} Module:{v}")
 
     while queue:
-        source_node_id, target_node_id, pulse = queue.pop(0) #BFS
-        if stop_condition is not None and (target_node_id, pulse) == stop_condition:
-            return graph, high_pulse_count, low_pulse_count, True
+        source_node_id, target_node_id, pulse = queue.popleft() #BFS
+        # if stop_condition is not None and (target_node_id, pulse) == stop_condition:
+        #     return graph, high_pulse_count, low_pulse_count, True
         if pulse == Pulse.HIGH:
             high_pulse_count += 1
         else:
             low_pulse_count += 1
 
-        # print(source_node_id, " -- ", pulse, "->", target_node_id)
-        # for k,v in graph.graph.items():
-        #     print(f">>>> Node:{k:<11} Module:{v}")
-
-
-        # if (target_node_id, pulse, graph) in visited_graph:
-        #     print("cycle detected", source_node_id, target_node_id, pulse)
-        #     # for l in visited_graph:
-        #     #     print(l)
-        #     break
-
-
-
         node = graph.get_node(node_id=target_node_id)
+        # if target_node_id == 'kc' and pulse == Pulse.HIGH:
+        #     print('>>>>>>', source_node_id, target_node_id, pulse)
+        #     print(node)
 
-        # insert the nodes in reverse order so that they are popped in the correct order
         for new_target_node_id, new_pulse  in node.process_input(pulse=pulse, source=source_node_id):
-            # print("adding", target_node_id, pulse, graph)
-            # heapq.heappush(queue, ((target_node_id, new_target_node_id, new_pulse))
             queue.append((target_node_id, new_target_node_id, new_pulse))
-        
-        # print("adding", target_node_id, pulse, graph)
-        # visited_graph.add((target_node_id, pulse, graph))
-        
-    return graph, high_pulse_count, low_pulse_count, False
 
+        if monitor_module:
+            if target_node_id == monitor_module[0] and pulse == monitor_module[1]:
+                # print('>>>>>>', source_node_id, target_node_id, pulse)
+                kc_node_flash_high.append((source_node_id, target_node_id, pulse))
 
+    return graph, high_pulse_count, low_pulse_count, kc_node_flash_high
+
+# 90045, 94138, 98231
 def problem1(input_):
     """"
 
@@ -269,10 +251,14 @@ def problem1(input_):
     total_high_pulse_count = 0
     total_low_pulse_count = 0
 
-    for _ in range(1000):
+    # history = {node_id: [] for node_id in graph.graph.keys()}
+
+    for _ in range(25000):
         graph, high_pulse_count, low_pulse_count, _ = run_simulation(graph=graph, pulse=Pulse.LOW)
         total_high_pulse_count += high_pulse_count
         total_low_pulse_count += low_pulse_count
+        # for node_id, state in graph.get_graph_state():
+        #     history[node_id].append(state)
         # print("graph state: ", graph.get_graph_state())
         # print("high pulse count: ", high_pulse_count)
         # print("low pulse count: ", low_pulse_count)
@@ -282,39 +268,54 @@ def problem1(input_):
     
 
 def problem2(input_):
+
+    """"
+    turns out there's no general solution and this works fine... 
+
+    Kind of annoying but I guess it's fine and not going crazy is nice :) 
+
+
+    https://www.reddit.com/r/adventofcode/comments/18ms8d1/2023_day_20_part_2_general_solution/
+
+    https://mliezun.github.io/2023/12/25/favourite-advent-of-code-2023.html
+    """
     graph = input_
 
-    total_high_pulse_count = 0
-    total_low_pulse_count = 0
+    conjuction_node_to_monitor = 'kc'
 
-    visited_graph = set()
-    print(graph)
+    inbound_node_sends_high_pulse = {}
+
+    # print(graph)
     # return
-    for i in range(1, 1000000001):
-        # print("button pressed", i)
-        if i % 10000 == 0:
-            print("i:", i)
-        graph, high_pulse_count, low_pulse_count, stop = run_simulation(graph=graph, pulse=Pulse.LOW, stop_condition= ('rx', Pulse.LOW))
-        # if graph in visited_graph:
-        #     print("cycle detected")
-        #     break
-        # visited_graph.add(graph)
-        # print(visited_graph)
-        total_high_pulse_count += high_pulse_count
-        total_low_pulse_count += low_pulse_count
-        # print("graph state: ", graph.get_graph_state())
-        # print("high pulse count: ", high_pulse_count)
-        # print("low pulse count: ", low_pulse_count)
-        if stop:
-            return i
+    for i in range(25_000):
+
+        # if i % 10000 == 0:
+        # print(i)
+
+        graph, high_pulse_count, low_pulse_count, kc_node_flash_high = run_simulation(graph=graph, pulse=Pulse.LOW, monitor_module=('kc', Pulse.HIGH))
+        # print(graph.get_node(conjuction_node_to_monitor))
+        for source, target, pulse in kc_node_flash_high:
+            if pulse == Pulse.HIGH:
+                inbound_node_sends_high_pulse.setdefault(source, [])
+                inbound_node_sends_high_pulse[source].append(i)
+                
     
+    print(inbound_node_sends_high_pulse)
+    
+    cycles = []
+    for k,v in inbound_node_sends_high_pulse.items():
+        cycles.append(v[-1] - v[-2])
+    print(cycles)
+    return math.lcm(*cycles)
 
 def main(fpath: str):
-    with open(fpath, 'r') as f:
-        input_ = parse_input(f)
+    def get_input():
+        with open(fpath, 'r') as f:
+            input_ = parse_input(f)
+            return input_
 
-    print('Problem 1: ', problem1(input_))  
-    print('Problem 2: ', problem2(input_))
+    print('Problem 1: ', problem1(get_input())) # 468240038292
+    print('Problem 2: ', problem2(get_input())) # 244151741342687
     return 0
 
 
