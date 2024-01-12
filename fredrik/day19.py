@@ -83,10 +83,6 @@ class PartRatingState:
     def __setitem__(self, item: str, value: Any) -> None:
         setattr(self, item, value)
 
-    # def from_true_condition(self, condition: Condition, /) -> PartRatingState:
-    #     lower, upper = self[condition.key]
-    #     new_state = self.copy()
-
     def split_by_condition(
         self, condition: Condition, /
     ) -> tuple[PartRatingState, PartRatingState]:

@@ -38,16 +38,6 @@ def parse_heatmap(heat_map_raw: str) -> dict[Coordinate, int]:
     return heat_map
 
 
-@functools.cache
-def cardinal_adjacent_indices(index: tuple[int, int]) -> list[Coordinate]:
-    return [
-        (index[0] - 1, index[1]),
-        (index[0], index[1] - 1),
-        (index[0], index[1] + 1),
-        (index[0] + 1, index[1]),
-    ]
-
-
 def get_goal(heat_map: dict[Coordinate, int]) -> Coordinate:
     return list(heat_map.keys())[-1]
 
@@ -124,7 +114,7 @@ def minimize_heatloss(heat_map: dict[Coordinate, int], ultra: bool = False) -> i
 
         seen.add(state)
 
-        for candidate in cardinal_adjacent_indices(index=state.position):
+        for candidate in utils.cardinal_adjacent_indices(index=state.position):
             if candidate not in valid_positions:
                 continue
 
