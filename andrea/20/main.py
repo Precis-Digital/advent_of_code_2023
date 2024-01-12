@@ -1,323 +1,239 @@
 import dataclasses
 import re
+from math import lcm
 
 print_progress = [False, False]
 
 
 @dataclasses.dataclass
-class RuleRange:
-    x: range
-    m: range
-    a: range
-    s: range
-
-    def __getitem__(self, item) -> range:
-        return getattr(self, item)
-
-    def __setitem__(self, key, value):
-        setattr(self, key, value)
-
-    @classmethod
-    def replace_range(cls,
-                      *,
-                      other: 'RuleRange',
-                      key: str,
-                      new_range: range):
-        new_ranges = cls(x=other.x,
-                         m=other.m,
-                         a=other.a,
-                         s=other.s)
-        new_ranges[key] = new_range
-        return new_ranges
-
-    def no_intersection(self,
-                        *,
-                        other_range: 'RuleRange'):
-        return ((min(self.x.stop, other_range.x.stop)
-                 - max(self.x.start, other_range.x.start)) <= 0
-                or (min(self.m.stop, other_range.m.stop)
-                    - max(self.m.start, other_range.m.start)) <= 0
-                or (min(self.a.stop, other_range.a.stop)
-                    - max(self.a.start, other_range.a.start)) <= 0
-                or (min(self.s.stop, other_range.s.stop)
-                    - max(self.s.start, other_range.s.start)) <= 0)
+class Pulse:
+    source: 'Module'
+    dest: 'Module'
+    high_low: bool
 
 
 @dataclasses.dataclass
-class WorkflowRule:
-    parameter: str
-    clause: str
-    value: int
-    then_workflow: str
+class Module:
+    type: str
+    name: str
+    destinations_names: list[str]
+    high_low: bool = False
 
-    _re_rule_part = re.compile(r'(\w+)([<>])(\d+):(\w+)$')
+    _re_match = re.compile(r'^([%&]?)(\w+) -> (\w+(?:, \w+)*)$')
 
     def __post_init__(self):
-        self._then_accept = self.then_workflow == 'A'
-        self._then_reject = self.then_workflow == 'R'
+        self.broadcaster = self.name == 'broadcaster'
+        assert ((self.broadcaster and self.type == '')
+                or (not self.broadcaster and self.type in {'%', '&', 'O'}))
+        self.flip_flop = self.type == '%'
+        self.conjunction = self.type == '&'
+        self.goal = self.type == 'O'
+        self.sources: dict['Module', bool] = {}
+        self.destinations: list['Module'] = []
 
-    @classmethod
-    def from_input_rule(cls,
-                        *,
-                        input_rule: str) -> 'WorkflowRule':
-        (parameter,
-         clause,
-         value,
-         then_workflow) = cls._re_rule_part.fullmatch(input_rule).groups()
-        return cls(parameter=parameter,
-                   clause=clause,
-                   value=int(value),
-                   then_workflow=then_workflow)
+    def __hash__(self) -> int:
+        return hash(self.name)
+
+    def __eq__(self, other: 'Module') -> bool:
+        return self.name == other.name
 
     def __repr__(self):
-        return f"{self.parameter}{self.clause}{self.value} -> {self.then_workflow}"
-
-    def rating_match_rule(self,
-                          *,
-                          step: int,
-                          rating: 'Rating') -> bool:
-        if print_progress[step - 1] > 1:
-            print(f"  {self.parameter}{self.clause}{self.value}", end='')
-        match self.clause:
-            case '>':
-                if rating[self.parameter] > self.value:
-                    if print_progress[step - 1] > 1:
-                        print(f" -> {self.then_workflow}")
-                    return True
-            case '<':
-                if rating[self.parameter] < self.value:
-                    if print_progress[step - 1] > 1:
-                        print(f" -> {self.then_workflow}")
-                    return True
-        if print_progress[step - 1] > 1:
-            print()
-        return False
-
-    def get_accept_ranges(
-            self,
-            *,
-            step: int,
-            workflows: dict[str, 'Workflow'],
-            accept_ranges: list[RuleRange],
-            alternate_ranges: list[RuleRange],
-            ranking_ranges: list['RuleRange']):
-
-        for ranking_range in ranking_ranges:
-            parameter_range = ranking_range[self.parameter]
-
-            if print_progress[step - 1] > 1:
-                print(f"  {self.parameter}{self.clause}{str(self.value).ljust(5)} {ranking_range}")
-
-            match self.clause:
-                case '>':
-                    passing_range = range(
-                            max(parameter_range.start, self.value + 1),
-                            parameter_range.stop)
-                    alternate_range = range(
-                            parameter_range.start,
-                            min(parameter_range.stop, self.value + 1))
-                case '<':
-                    passing_range = range(
-                            parameter_range.start,
-                            min(parameter_range.stop, self.value))
-                    alternate_range = range(
-                            max(parameter_range.start, self.value),
-                            parameter_range.stop)
-                case _:
-                    raise ValueError(f"Invalid clause: {self.clause}")
-
-            if alternate_range.start < alternate_range.stop:
-                alternate_ranges.append(
-                        RuleRange.replace_range(
-                                other=ranking_range,
-                                key=self.parameter,
-                                new_range=alternate_range))
-                if print_progress[step - 1] > 1:
-                    print(f"    split  {alternate_ranges[-1]}")
-
-            if passing_range.start < passing_range.stop:
-                new_ranking_range = RuleRange.replace_range(
-                        other=ranking_range,
-                        key=self.parameter,
-                        new_range=passing_range)
-                if self._then_accept:
-                    accept_ranges.append(new_ranking_range)
-                    if print_progress[step - 1] > 1:
-                        print(f"    Accept {new_ranking_range}")
-                elif not self._then_reject:
-                    if print_progress[step - 1] > 1:
-                        print(f"    {self.then_workflow.rjust(6)} {new_ranking_range}")
-                    workflows[self.then_workflow].get_accept_ranges(
-                            step=step,
-                            workflows=workflows,
-                            accept_ranges=accept_ranges,
-                            ranking_ranges=[new_ranking_range])
-
-
-@dataclasses.dataclass
-class Workflow:
-    name: str
-    rules: list[WorkflowRule]
-    else_workflow: str
-
-    _re_input = re.compile(r'^(\w+)\{([^}]+)}$')
-
-    def __post_init__(self):
-        self._else_accept = self.else_workflow == 'A'
-        self._else_reject = self.else_workflow == 'R'
-
-    @classmethod
-    def from_input_rules(cls,
-                         *,
-                         input_rules: list[str]) -> list['WorkflowRule']:
-        return [WorkflowRule.from_input_rule(input_rule=input_rule)
-                for input_rule in input_rules]
+        return f"{self.name} {int(self.high_low)}"
 
     @classmethod
     def from_input_line(cls,
                         *,
                         input_line: str):
-        name, input_rules = cls._re_input.fullmatch(input_line).groups()
-        input_rules = input_rules.split(',')
-        return cls(name=name,
-                   rules=cls.from_input_rules(input_rules=input_rules[:-1]),
-                   else_workflow=input_rules[-1])
+        type_str, name, destinations = cls._re_match.fullmatch(input_line).groups()
+        return cls(type=type_str,
+                   name=name,
+                   destinations_names=destinations.split(', '))
 
-    def rating_to_workflow(self,
-                           *,
-                           step: int,
-                           rating: 'Rating') -> str:
-        for rule in self.rules:
-            if rule.rating_match_rule(step=step,
-                                      rating=rating):
-                return rule.then_workflow
-        return self.else_workflow
-
-    def get_accept_ranges(
-            self,
-            *,
-            step: int,
-            workflows: dict[str, 'Workflow'],
-            accept_ranges: list[RuleRange],
-            ranking_ranges: list[RuleRange]):
-
-        for rule in self.rules:
-            if print_progress[step - 1] > 1:
-                print(f" {self.name.ljust(5)} {rule}")
-            rule_alternate_ranges: list[RuleRange] = []
-            rule.get_accept_ranges(
-                    step=step,
-                    workflows=workflows,
-                    accept_ranges=accept_ranges,
-                    alternate_ranges=rule_alternate_ranges,
-                    ranking_ranges=ranking_ranges)
-            ranking_ranges = rule_alternate_ranges
-
-        if self._else_accept:
-            accept_ranges.extend(ranking_ranges)
-        elif not self._else_reject:
-            workflows[self.else_workflow].get_accept_ranges(
-                    step=step,
-                    workflows=workflows,
-                    accept_ranges=accept_ranges,
-                    ranking_ranges=ranking_ranges)
-
-
-@dataclasses.dataclass(frozen=True, kw_only=True)
-class Rating:
-    x: int
-    m: int
-    a: int
-    s: int
-
-    _re_input = re.compile(r'^\{x=(\d+),m=(\d+),a=(\d+),s=(\d+)}$')
+    def add_input(self,
+                  *,
+                  module: 'Module'):
+        self.sources[module] = False
 
     @classmethod
-    def from_input_line(cls,
-                        *,
-                        input_line: str) -> 'Rating':
-        x, m, a, s = cls._re_input.fullmatch(input_line).groups()
-        return cls(x=int(x),
-                   m=int(m),
-                   a=int(a),
-                   s=int(s))
+    def complete(cls,
+                 *,
+                 modules: dict[str, 'Module']) -> tuple['Module', 'Module']:
+        goal: 'Module' or None = None
+        to_goal: 'Module' or None = None
+        for module in modules.values():
+            for destination_name in module.destinations_names:
+                if destination_name in modules:
+                    destination = modules[destination_name]
+                else:
+                    assert goal is None
+                    assert to_goal is None
+                    destination = goal = cls(
+                            type='O',
+                            name=destination_name,
+                            destinations_names=[])
+                    to_goal = module
+                module.destinations.append(destination)
+                destination.add_input(module=module)
 
-    def __getitem__(self, item: str) -> int:
-        return getattr(self, item)
+        assert goal is not None
+        assert to_goal is not None
 
-    def accept_value(self,
-                     *,
-                     step: int,
-                     workflows: dict[str, Workflow]) -> int:
-        if print_progress[step - 1] > 1:
-            print(f"{{x={self.x},m={self.m},a={self.a},s={self.s}}}:")
-        result = workflows['in'].rating_to_workflow(step=step,
-                                                    rating=self)
-        while result not in {'A', 'R'}:
-            result = workflows[result].rating_to_workflow(step=step,
-                                                          rating=self)
+        modules[goal.name] = goal
 
-        assert result in {'A', 'R'}
+        return to_goal, goal
 
-        if print_progress[step - 1]:
-            print(f" {(self.x + self.m + self.a + self.s) if result == 'A' else 0}")
+    @staticmethod
+    def update_iterations_to_goal(
+            *,
+            source: 'Module',
+            iteration: int | None = None,
+            iterations_to_goal: dict['Module', int] | None = None):
+        if iteration is not None and iterations_to_goal is not None:
+            if (source in iterations_to_goal
+                    and iterations_to_goal[source] == 0):
+                iterations_to_goal[source] = iteration
 
-        return (self.x + self.m + self.a + self.s) if result == 'A' else 0
+    def pulse(self,
+              *,
+              high_low: bool,
+              next_pulses: list[Pulse] | None = None,
+              iteration: int | None = None,
+              iterations_to_goal: dict['Module', int] | None = None,
+              source: 'Module' = None) -> tuple[int, int]:
+        num_high, num_low = int(high_low), int(not high_low)
+
+        if self.goal:
+            self.high_low = high_low
+        elif self.broadcaster:
+            next_pulses = []
+            for destination in self.destinations:
+                (num_high_loop,
+                 num_low_loop) = destination.pulse(
+                        high_low=high_low,
+                        source=self,
+                        next_pulses=next_pulses,
+                        iteration=iteration,
+                        iterations_to_goal=iterations_to_goal)
+                num_high += num_high_loop
+                num_low += num_low_loop
+
+            while next_pulses:
+                next_pulse = next_pulses.pop(0)
+                (num_high_loop,
+                 num_low_loop) = next_pulse.dest.pulse(
+                        high_low=next_pulse.high_low,
+                        source=next_pulse.source,
+                        next_pulses=next_pulses,
+                        iteration=iteration,
+                        iterations_to_goal=iterations_to_goal)
+                num_high += num_high_loop
+                num_low += num_low_loop
+
+        elif self.flip_flop:
+            if high_low:
+                self.update_iterations_to_goal(
+                        source=source,
+                        iteration=iteration,
+                        iterations_to_goal=iterations_to_goal)
+            if not high_low:
+                self.high_low = not self.high_low
+                for destination in self.destinations:
+                    next_pulses.append(Pulse(
+                            source=self,
+                            dest=destination,
+                            high_low=self.high_low))
+                    # (num_high_loop,
+                    #  num_low_loop) = destination.pulse(
+                    #         high_low=self.high_low,
+                    #         source=self,
+                    #         next_pulses=next_pulses,
+                    #         iteration=iteration,
+                    #         iterations_to_goal=iterations_to_goal)
+                    # num_high += num_high_loop
+                    # num_low += num_low_loop
+
+        elif self.conjunction:
+            self.sources[source] = high_low
+            if high_low:
+                self.update_iterations_to_goal(
+                        source=source,
+                        iteration=iteration,
+                        iterations_to_goal=iterations_to_goal)
+            if all(self.sources.values()):
+                for destination in self.destinations:
+                    next_pulses.append(Pulse(
+                            source=self,
+                            dest=destination,
+                            high_low=False))
+                    # (num_high_loop,
+                    #  num_low_loop) = destination.pulse(
+                    #         high_low=False,
+                    #         source=self,
+                    #         next_pulses=next_pulses,
+                    #         iteration=iteration,
+                    #         iterations_to_goal=iterations_to_goal)
+                    # num_high += num_high_loop
+                    # num_low += num_low_loop
+            else:
+                for destination in self.destinations:
+                    next_pulses.append(Pulse(
+                            source=self,
+                            dest=destination,
+                            high_low=True))
+                    # (num_high_loop,
+                    #  num_low_loop) = destination.pulse(
+                    #         high_low=True,
+                    #         source=self,
+                    #         next_pulses=next_pulses,
+                    #         iteration=iteration,
+                    #         iterations_to_goal=iterations_to_goal)
+                    # num_high += num_high_loop
+                    # num_low += num_low_loop
+        else:
+            raise ValueError(f"Invalid module type: {self.type}")
+
+        return num_high, num_low
 
 
 def solve(*,
           step: int):
     print('*' * 20, f"Step {step}")
 
-    workflows: dict[str, Workflow] = {}
-    ratings: list[Rating] = []
+    modules: dict[str, 'Module'] = {}
+    broadcaster: Module or None = None
     with (open('input.txt', 'r') as input_file):
-        lines = input_file.read().splitlines()
-        split_line = lines.index('')
+        for line in input_file.read().splitlines():
+            module = Module.from_input_line(input_line=line)
+            modules[module.name] = module
+            if module.broadcaster:
+                assert broadcaster is None
+                broadcaster = module
 
-        for line in lines[:split_line]:
-            workflow = Workflow.from_input_line(input_line=line)
-            assert workflow.name not in workflows
-            workflows[workflow.name] = workflow
+    assert broadcaster is not None
 
-        if step == 1:
-            for line in lines[split_line + 1:]:
-                rating = Rating.from_input_line(input_line=line)
-                ratings.append(rating)
+    to_goal, goal = Module.complete(modules=modules)
 
     if step == 1:
-        accept_values = [rating.accept_value(step=step,
-                                             workflows=workflows)
-                         for rating in ratings]
+        num_high, num_low = 0, 0
+        for _ in range(1, 1001):
+            num_high_loop, num_low_loop = broadcaster.pulse(high_low=False)
+            num_high += num_high_loop
+            num_low += num_low_loop
 
-        result = sum(accept_values)
+        result = num_high * num_low
     else:
-        start_range = RuleRange(x=range(1, 4001),
-                                m=range(1, 4001),
-                                a=range(1, 4001),
-                                s=range(1, 4001))
-        accept_ranges: list[RuleRange] = []
-        workflows['in'].get_accept_ranges(
-                step=step,
-                workflows=workflows,
-                accept_ranges=accept_ranges,
-                ranking_ranges=[start_range])
+        num_pushes = 0
+        iterations_to_goal: dict[Module, int] = {
+            module: 0
+            for module in to_goal.sources.keys()}
+        while any(iterations == 0
+                  for iterations in iterations_to_goal.values()):
+            num_pushes += 1
+            broadcaster.pulse(high_low=False,
+                              iteration=num_pushes,
+                              iterations_to_goal=iterations_to_goal)
 
-        if print_progress[step - 1] > 1:
-            print('\n'.join(f"{accept_range.x} {accept_range.m} {accept_range.a} {accept_range.s}"
-                            for accept_range in accept_ranges))
-
-        assert all(all(first_range.no_intersection(other_range=second_range)
-                       for second_range in (accept_ranges[:index_first]
-                                            + accept_ranges[index_first + 1:]))
-                   for index_first, first_range in enumerate(accept_ranges))
-
-        result = 0
-        for accept_range in accept_ranges:
-            result += ((accept_range.x.stop - accept_range.x.start)
-                       * (accept_range.m.stop - accept_range.m.start)
-                       * (accept_range.a.stop - accept_range.a.start)
-                       * (accept_range.s.stop - accept_range.s.start))
+        result = lcm(*iterations_to_goal.values())
 
     print('*' * 20, f"Step {step}", result)
 

@@ -1,239 +1,180 @@
-import dataclasses
-import re
-from math import lcm
+import functools
 
 print_progress = [False, False]
 
 
-@dataclasses.dataclass
-class Pulse:
-    source: 'Module'
-    dest: 'Module'
-    high_low: bool
-
-
-@dataclasses.dataclass
-class Module:
-    type: str
-    name: str
-    destinations_names: list[str]
-    high_low: bool = False
-
-    _re_match = re.compile(r'^([%&]?)(\w+) -> (\w+(?:, \w+)*)$')
-
-    def __post_init__(self):
-        self.broadcaster = self.name == 'broadcaster'
-        assert ((self.broadcaster and self.type == '')
-                or (not self.broadcaster and self.type in {'%', '&', 'O'}))
-        self.flip_flop = self.type == '%'
-        self.conjunction = self.type == '&'
-        self.goal = self.type == 'O'
-        self.sources: dict['Module', bool] = {}
-        self.destinations: list['Module'] = []
-
-    def __hash__(self) -> int:
-        return hash(self.name)
-
-    def __eq__(self, other: 'Module') -> bool:
-        return self.name == other.name
-
-    def __repr__(self):
-        return f"{self.name} {int(self.high_low)}"
-
-    @classmethod
-    def from_input_line(cls,
-                        *,
-                        input_line: str):
-        type_str, name, destinations = cls._re_match.fullmatch(input_line).groups()
-        return cls(type=type_str,
-                   name=name,
-                   destinations_names=destinations.split(', '))
-
-    def add_input(self,
-                  *,
-                  module: 'Module'):
-        self.sources[module] = False
-
-    @classmethod
-    def complete(cls,
-                 *,
-                 modules: dict[str, 'Module']) -> tuple['Module', 'Module']:
-        goal: 'Module' or None = None
-        to_goal: 'Module' or None = None
-        for module in modules.values():
-            for destination_name in module.destinations_names:
-                if destination_name in modules:
-                    destination = modules[destination_name]
-                else:
-                    assert goal is None
-                    assert to_goal is None
-                    destination = goal = cls(
-                            type='O',
-                            name=destination_name,
-                            destinations_names=[])
-                    to_goal = module
-                module.destinations.append(destination)
-                destination.add_input(module=module)
-
-        assert goal is not None
-        assert to_goal is not None
-
-        modules[goal.name] = goal
-
-        return to_goal, goal
-
-    @staticmethod
-    def update_iterations_to_goal(
+class Brick:
+    def __init__(
+            self,
             *,
-            source: 'Module',
-            iteration: int | None = None,
-            iterations_to_goal: dict['Module', int] | None = None):
-        if iteration is not None and iterations_to_goal is not None:
-            if (source in iterations_to_goal
-                    and iterations_to_goal[source] == 0):
-                iterations_to_goal[source] = iteration
+            id: int,
+            coord_1: tuple[int, int],
+            coord_2: tuple[int, int],
+            height: int,
+            z: int):
+        self.id = id
+        self.coord_1 = coord_1
+        self.coord_2 = coord_2
+        self.height = height
+        self.z = z
+        self.holding: set['Brick'] = set()
+        self.held_by: set['Brick'] = set()
 
-    def pulse(self,
-              *,
-              high_low: bool,
-              next_pulses: list[Pulse] | None = None,
-              iteration: int | None = None,
-              iterations_to_goal: dict['Module', int] | None = None,
-              source: 'Module' = None) -> tuple[int, int]:
-        num_high, num_low = int(high_low), int(not high_low)
+    def __repr__(self) -> str:
+        return (f"{str(self.id).rjust(4)} ({self.coord_1})-({self.coord_2}) {self.z}-{self.z_top}"
+                f" {tuple(b.id for b in self.held_by)} <"
+                f" {tuple(b.id for b in self.holding)}")
 
-        if self.goal:
-            self.high_low = high_low
-        elif self.broadcaster:
-            next_pulses = []
-            for destination in self.destinations:
-                (num_high_loop,
-                 num_low_loop) = destination.pulse(
-                        high_low=high_low,
-                        source=self,
-                        next_pulses=next_pulses,
-                        iteration=iteration,
-                        iterations_to_goal=iterations_to_goal)
-                num_high += num_high_loop
-                num_low += num_low_loop
+    @property
+    def z(self):
+        return self._z
 
-            while next_pulses:
-                next_pulse = next_pulses.pop(0)
-                (num_high_loop,
-                 num_low_loop) = next_pulse.dest.pulse(
-                        high_low=next_pulse.high_low,
-                        source=next_pulse.source,
-                        next_pulses=next_pulses,
-                        iteration=iteration,
-                        iterations_to_goal=iterations_to_goal)
-                num_high += num_high_loop
-                num_low += num_low_loop
+    @z.setter
+    def z(self, value):
+        self._z = value
+        self.z_top = self.z + self.height
 
-        elif self.flip_flop:
-            if high_low:
-                self.update_iterations_to_goal(
-                        source=source,
-                        iteration=iteration,
-                        iterations_to_goal=iterations_to_goal)
-            if not high_low:
-                self.high_low = not self.high_low
-                for destination in self.destinations:
-                    next_pulses.append(Pulse(
-                            source=self,
-                            dest=destination,
-                            high_low=self.high_low))
-                    # (num_high_loop,
-                    #  num_low_loop) = destination.pulse(
-                    #         high_low=self.high_low,
-                    #         source=self,
-                    #         next_pulses=next_pulses,
-                    #         iteration=iteration,
-                    #         iterations_to_goal=iterations_to_goal)
-                    # num_high += num_high_loop
-                    # num_low += num_low_loop
+    @classmethod
+    def add_from_input_line(
+            cls,
+            *,
+            input_line_index: int,
+            input_line: str,
+            bricks: dict[int, set['Brick']]):
+        coord_1, coord_2 = input_line.split('~')
 
-        elif self.conjunction:
-            self.sources[source] = high_low
-            if high_low:
-                self.update_iterations_to_goal(
-                        source=source,
-                        iteration=iteration,
-                        iterations_to_goal=iterations_to_goal)
-            if all(self.sources.values()):
-                for destination in self.destinations:
-                    next_pulses.append(Pulse(
-                            source=self,
-                            dest=destination,
-                            high_low=False))
-                    # (num_high_loop,
-                    #  num_low_loop) = destination.pulse(
-                    #         high_low=False,
-                    #         source=self,
-                    #         next_pulses=next_pulses,
-                    #         iteration=iteration,
-                    #         iterations_to_goal=iterations_to_goal)
-                    # num_high += num_high_loop
-                    # num_low += num_low_loop
-            else:
-                for destination in self.destinations:
-                    next_pulses.append(Pulse(
-                            source=self,
-                            dest=destination,
-                            high_low=True))
-                    # (num_high_loop,
-                    #  num_low_loop) = destination.pulse(
-                    #         high_low=True,
-                    #         source=self,
-                    #         next_pulses=next_pulses,
-                    #         iteration=iteration,
-                    #         iterations_to_goal=iterations_to_goal)
-                    # num_high += num_high_loop
-                    # num_low += num_low_loop
+        (x_1, y_1, z_1) = coord_1.split(',')
+        (x_2, y_2, z_2) = coord_2.split(',')
+
+        brick = cls(id=input_line_index + 1,
+                    coord_1=(int(x_1), int(y_1)),
+                    coord_2=(int(x_2), int(y_2)),
+                    z=min(int(z_1), int(z_2)),
+                    height=abs(int(z_1) - int(z_2)) + 1)
+
+        if brick.z in bricks:
+            bricks[brick.z].add(brick)
         else:
-            raise ValueError(f"Invalid module type: {self.type}")
+            bricks[brick.z] = {brick}
 
-        return num_high, num_low
+    @functools.cached_property
+    def area(self) -> set[tuple[int, int]]:
+        area: set[tuple[int, int]] = set()
+        for x in range(min(self.coord_1[0], self.coord_2[0]),
+                       max(self.coord_1[0], self.coord_2[0]) + 1):
+            for y in range(min(self.coord_1[1], self.coord_2[1]),
+                           max(self.coord_1[1], self.coord_2[1]) + 1):
+                area.add((x, y))
+        return area
+
+    @property
+    def free(self) -> bool:
+        return all(len(held_brick.held_by) != 1
+                   for held_brick in self.holding)
+
+    def would_fall(self,
+                   *,
+                   disintegrated: set['Brick']):
+        return self.held_by.issubset(disintegrated)
+
+    def chain_disintegrate(
+            self,
+            *,
+            disintegrated: set['Brick'] = None):
+        if disintegrated is None:
+            disintegrated = {self}
+        would_fall = set(
+                brick
+                for brick in self.holding
+                if brick.would_fall(disintegrated=disintegrated))
+        disintegrated.update(would_fall)
+        for brick in would_fall:
+            brick.chain_disintegrate(disintegrated=disintegrated)
+        return disintegrated
+
+    def holds(self,
+              *,
+              brick: 'Brick'):
+        self.holding.add(brick)
+        brick.held_by.add(self)
+
+    def fall_to(
+            self,
+            *,
+            z: int,
+            bricks: dict[int, set['Brick']],
+            floor_area_z_top: dict[tuple[int, int], int],
+            floor_area_bricks: dict[tuple[int, int], list['Brick']]):
+        if self.z > z:
+            bricks[self.z].remove(self)
+            self.z = z
+            if z in bricks:
+                bricks[z].add(self)
+            else:
+                bricks[z] = {self}
+
+        for coord in self.area:
+            floor_area_z_top[coord] = self.z_top
+            if coord in floor_area_bricks:
+                top_brick = floor_area_bricks[coord][-1]
+                if top_brick.z_top == self.z:
+                    top_brick.holds(brick=self)
+                floor_area_bricks[coord].append(self)
+            else:
+                floor_area_bricks[coord] = [self]
 
 
 def solve(*,
           step: int):
     print('*' * 20, f"Step {step}")
 
-    modules: dict[str, 'Module'] = {}
-    broadcaster: Module or None = None
+    bricks: dict[int, set[Brick]] = {}
     with (open('input.txt', 'r') as input_file):
-        for line in input_file.read().splitlines():
-            module = Module.from_input_line(input_line=line)
-            modules[module.name] = module
-            if module.broadcaster:
-                assert broadcaster is None
-                broadcaster = module
+        for index_line, line in enumerate(input_file.read().splitlines()):
+            Brick.add_from_input_line(input_line_index=index_line,
+                                      input_line=line,
+                                      bricks=bricks)
 
-    assert broadcaster is not None
+    floor_bricks: set[Brick] = bricks[1]
+    floor_area_z_top: dict[tuple[int, int], int] = {}
+    floor_area_bricks: dict[tuple[int, int], list[Brick]] = {}
+    for brick in floor_bricks:
+        for coord in brick.area:
+            floor_area_z_top[coord] = brick.z_top
+            floor_area_bricks[coord] = [brick]
 
-    to_goal, goal = Module.complete(modules=modules)
+    falling_bricks: list[Brick] = sorted(
+            [
+                brick
+                for z, z_bricks in bricks.items()
+                if z > 1
+                for brick in z_bricks],
+            key=lambda b: b.z)
+
+    while falling_bricks:
+        brick = falling_bricks.pop(0)
+        z_below = max(floor_area_z_top.get(coord, 1)
+                      for coord in brick.area)
+        brick.fall_to(
+                z=z_below,
+                bricks=bricks,
+                floor_area_z_top=floor_area_z_top,
+                floor_area_bricks=floor_area_bricks)
 
     if step == 1:
-        num_high, num_low = 0, 0
-        for _ in range(1, 1001):
-            num_high_loop, num_low_loop = broadcaster.pulse(high_low=False)
-            num_high += num_high_loop
-            num_low += num_low_loop
+        free_bricks = [brick
+                   for z, z_bricks in bricks.items()
+                   for brick in z_bricks
+                   if brick.free]
 
-        result = num_high * num_low
+        result = len(free_bricks)
     else:
-        num_pushes = 0
-        iterations_to_goal: dict[Module, int] = {
-            module: 0
-            for module in to_goal.sources.keys()}
-        while any(iterations == 0
-                  for iterations in iterations_to_goal.values()):
-            num_pushes += 1
-            broadcaster.pulse(high_low=False,
-                              iteration=num_pushes,
-                              iterations_to_goal=iterations_to_goal)
+        sum_num_other_bricks = 0
+        for z, z_bricks in bricks.items():
+            for brick in z_bricks:
+                sum_num_other_bricks += len(brick.chain_disintegrate()) - 1
 
-        result = lcm(*iterations_to_goal.values())
+        result = sum_num_other_bricks
 
     print('*' * 20, f"Step {step}", result)
 
